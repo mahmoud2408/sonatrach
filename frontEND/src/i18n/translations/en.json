@@ -1,0 +1,18 @@
+{
+    "navbar": {
+      "home": "Home",
+      "activities": "Activities",
+      "members": "Members",
+      "admin": "Admin",
+      "language": "Language",
+      "login": "Login"
+    },
+    "home": {
+      "title": "More time for sports",
+      "description": "The leader in sports management software..."
+    },
+    "footer": {
+      "copyright": "© 2025 - Sports Club"
+    }
+  }
+  

@@ -1,0 +1,18 @@
+{
+    "navbar": {
+      "home": "Inicio",
+      "activities": "Actividades",
+      "members": "Miembros",
+      "admin": "Admin",
+      "language": "Idioma",
+      "login": "Iniciar sesión"
+    },
+    "home": {
+      "title": "Más tiempo para el deporte",
+      "description": "El líder en software de gestión deportiva..."
+    },
+    "footer": {
+      "copyright": "© 2025 - Club Deportivo"
+    }
+  }
+  

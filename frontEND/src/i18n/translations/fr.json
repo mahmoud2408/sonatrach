@@ -1,0 +1,18 @@
+{
+    "navbar": {
+      "home": "Accueil",
+      "activities": "Activités",
+      "members": "Membres",
+      "admin": "Admin",
+      "language": "Langue",
+      "login": "Se connecter"
+    },
+    "home": {
+      "title": "Plus de temps pour le sport",
+      "description": "Le leader des logiciels de gestion sportive..."
+    },
+    "footer": {
+      "copyright": "© 2025 - Club Sportif"
+    }
+  }
+  
