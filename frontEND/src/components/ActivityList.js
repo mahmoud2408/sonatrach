@@ -1,3 +1,4 @@
+// frontend/src/pages/ActivityList.js
 import React, { useEffect, useState } from 'react';
 import { getActivities } from '../services/api';
 
@@ -6,27 +7,29 @@ function ActivityList() {
 
   useEffect(() => {
     getActivities()
-      .then((res) => {
-        setActivities(res.data);
+      .then(res => {
+         console.log("Activités récupérées :", res.data);
+         setActivities(res.data);
       })
-      .catch((err) => {
-        console.error('Erreur récupération activités:', err);
-      });
+      .catch(err => console.error("Erreur lors du chargement des activités:", err));
   }, []);
 
   return (
-    <div className="mt-3">
+    <div className="container">
+      <h1 className="mt-4">Activités Disponibles</h1>
       {activities.length === 0 ? (
         <p>Aucune activité pour le moment.</p>
       ) : (
-        <div className="list-group">
-          {activities.map((activity) => (
-            <div key={activity.id} className="list-group-item">
+        <ul className="list-group">
+          {activities.map(activity => (
+            <li key={activity.id} className="list-group-item">
               <h5>{activity.title}</h5>
               <p>Date : {activity.date}</p>
-            </div>
+              <p>Heure : {activity.hour}</p>
+              <p>Description : {activity.description}</p>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

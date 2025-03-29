@@ -63,9 +63,20 @@ export async function loginUser(loginData) {
     throw error;
   }
 }
-export function getActivities() {
-  return apiClient.get("/activities");
+
+
+export async function getActivities() {
+  try {
+    const response = await axios.get("http://localhost:5005/api/activities", {
+      withCredentials: true,
+      headers: { "Cache-Control": "no-cache" }
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
 }
+
 
 export function getMembers() {
   return apiClient.get("/members");

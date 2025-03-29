@@ -1,4 +1,3 @@
-// frontend/src/pages/ResetPassword.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +10,6 @@ function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const navigate = useNavigate();
 
-  // Etape 1 : Demander l'envoi d'un code par email
   const handleRequestReset = async (e) => {
     e.preventDefault();
     try {
@@ -21,6 +19,7 @@ function ResetPassword() {
         body: JSON.stringify({ email }),
       });
       const data = await response.json();
+      console.log("Réponse request-reset:", data);
       if (response.ok) {
         alert("Un code de réinitialisation vous a été envoyé par email");
         setStep(2);
@@ -33,7 +32,6 @@ function ResetPassword() {
     }
   };
 
-  // Etape 2 : Valider le code et envoyer le nouveau mot de passe
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
@@ -43,6 +41,7 @@ function ResetPassword() {
         body: JSON.stringify({ email, code, newPassword }),
       });
       const data = await response.json();
+      console.log("Réponse reset-password:", data);
       if (response.ok) {
         alert("Votre mot de passe a été réinitialisé avec succès");
         navigate("/login");
@@ -50,10 +49,7 @@ function ResetPassword() {
         alert(`Erreur : ${data.error}`);
       }
     } catch (error) {
-      console.error(
-        "Erreur lors de la réinitialisation du mot de passe :",
-        error
-      );
+      console.error("Erreur lors de la réinitialisation du mot de passe :", error);
       alert("Erreur lors de la réinitialisation du mot de passe");
     }
   };

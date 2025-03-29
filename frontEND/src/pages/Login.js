@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 
 const API_URL = "http://localhost:5005/api";
 
@@ -7,30 +8,23 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Appeler l'API de connexion
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // Permet de gérer les cookies de session
-        body: JSON.stringify({
-          login: username, // Le backend attend un champ "login" (email ou username)
-          password,
-          rememberMe,
-        }),
+        credentials: "include",
+        body: JSON.stringify({ login: username, password, rememberMe }),
       });
-
       const data = await response.json();
-
+      console.log("Réponse de connexion :", data);
       if (response.ok) {
+        login({ userId: data.userId, role: data.role });
         alert(`Connexion réussie, utilisateur ID : ${data.userId}`);
-        // Vous pouvez rediriger l'utilisateur ou effectuer d'autres actions ici
         navigate("/");
       } else {
         alert(`Erreur : ${data.error}`);
@@ -43,11 +37,9 @@ function Login() {
 
   return (
     <div className="container my-5" style={{ maxWidth: "400px" }}>
-      <h3 className="text-center mb-4">Content de vous revoir&nbsp;!</h3>
+      <h3 className="text-center mb-4">Content de vous revoir !</h3>
       <h4 className="text-center mb-4">Connectez-vous à votre compte</h4>
-
       <form onSubmit={handleSubmit}>
-        {/* Nom d'utilisateur */}
         <div className="mb-3">
           <input
             type="text"
@@ -58,8 +50,6 @@ function Login() {
             required
           />
         </div>
-
-        {/* Mot de passe */}
         <div className="mb-3">
           <input
             type="password"
@@ -70,8 +60,6 @@ function Login() {
             required
           />
         </div>
-
-        {/* Se souvenir de moi */}
         <div className="form-check mb-3">
           <input
             className="form-check-input"
@@ -83,17 +71,11 @@ function Login() {
           <label className="form-check-label" htmlFor="rememberMe">
             Se souvenir de moi
           </label>
-          {/* Lien "mot de passe oublié" */}
-          <a href="/reset-password" className="ms-2">
-            Vous avez oublié votre mot de passe&nbsp;?
-          </a>
+          <Link to="/reset-password" className="ms-2">
+            Vous avez oublié votre mot de passe ?
+          </Link>
         </div>
-
-        {/* Bouton Se connecter */}
-        <button
-          type="submit"
-          className="btn btn-primary w-100 btn-se-connecter"
-        >
+        <button type="submit" className="btn btn-primary w-100 btn-se-connecter">
           Se connecter
         </button>
       </form>

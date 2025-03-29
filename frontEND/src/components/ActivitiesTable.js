@@ -1,3 +1,4 @@
+// frontend/src/components/ActivitiesTable.js
 import React, { useEffect, useState } from 'react';
 import { getActivities } from '../services/api';
 
@@ -5,43 +6,41 @@ function ActivitiesTable() {
   const [activities, setActivities] = useState([]);
 
   useEffect(() => {
-    // Récupération des activités via l’API
     getActivities()
-      .then((res) => {
-        // Supposons que res.data est un tableau d'activités
-        // avec { id, title, date, membersCount }
-        setActivities(res.data);
+      .then(res => {
+         console.log("Activités récupérées :", res.data);
+         setActivities(res.data);
       })
-      .catch((err) => {
-        console.error('Erreur lors de la récupération des activités:', err);
-      });
+      .catch(err => console.error("Erreur lors du chargement des activités:", err));
   }, []);
 
   return (
-    <div className="mt-3">
-      <h3>Activités et Nombre de Membres</h3>
-      <table className="table table-bordered table-striped">
-        <thead className="table-dark">
-          <tr>
-            <th>Activité</th>
-            <th>Date</th>
-            <th>heure</th>
-            <th>Nombre de Membres</th>
-            
-           
-            
-          </tr>
-        </thead>
-        <tbody>
-          {activities.map((activity) => (
-            <tr key={activity.id}>
-              <td>{activity.title}</td>
-              <td>{activity.date}</td>
-              <td>{activity.membersCount}</td>
+    <div className="container mt-3">
+      <h3>Activités Disponibles</h3>
+      {activities.length === 0 ? (
+        <p>Aucune activité pour le moment.</p>
+      ) : (
+        <table className="table table-bordered table-striped">
+          <thead className="table-dark">
+            <tr>
+              <th>Activité</th>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>Nombre de Membres</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {activities.map(activity => (
+              <tr key={activity.id}>
+                <td>{activity.title}</td>
+                <td>{activity.date}</td>
+                <td>{activity.hour}</td>
+                <td>{activity.membersCount || 0}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
