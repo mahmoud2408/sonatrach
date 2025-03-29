@@ -33,6 +33,11 @@ function CreateProfile() {
       alert(error.message);
     }
   };
+  const handleMobile = (e) => {
+    const fromattedPhoneNumber = formatPhoneNumber(e.target.value);
+    if (e.target.value.length > 14) return alert("votre numero est faux");
+    else return setMobile(fromattedPhoneNumber);
+  };
 
   return (
     <div className="container my-5" style={{ maxWidth: "600px" }}>
@@ -97,7 +102,7 @@ function CreateProfile() {
             id="mobile"
             placeholder="06 12 34 56 78"
             value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
+            onChange={(e) => handleMobile(e)}
           />
         </div>
 
@@ -114,6 +119,8 @@ function CreateProfile() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            pattern="^[A-Za-z]{6,}\d*$"
+            title="le nom d'utilisateur doit commencer par des lettres et avoir au moins 6 caractères"
           />
         </div>
 
@@ -192,6 +199,32 @@ function CreateProfile() {
       </form>
     </div>
   );
+}
+function formatPhoneNumber(value) {
+  if (!value) return value;
+  const phoneNumber = value.replace(/[^\d]/g, "");
+  const phoneNumberlength = phoneNumber.length;
+  if (phoneNumberlength < 3) return phoneNumber;
+  if (phoneNumberlength < 5)
+    return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 4)}`;
+  if (phoneNumberlength < 7)
+    return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(
+      2,
+      4
+    )} ${phoneNumber.slice(4, 6)}`;
+  if (phoneNumberlength < 9)
+    return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(
+      2,
+      4
+    )} ${phoneNumber.slice(4, 6)} ${phoneNumber.slice(6, 8)}`;
+  if (phoneNumberlength < 11)
+    return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(
+      2,
+      4
+    )} ${phoneNumber.slice(4, 6)} ${phoneNumber.slice(
+      6,
+      8
+    )} ${phoneNumber.slice(8, 10)}`;
 }
 
 export default CreateProfile;
