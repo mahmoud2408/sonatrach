@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 // Route pour l'inscription
 router.post("/profil", async (req, res) => {
@@ -117,6 +118,110 @@ router.post("/login", async (req, res) => {
     res
       .status(500)
       .json({ error: "Erreur interne du serveur lors de la connexion." });
+  }
+});
+
+router.post("/request-reset", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: "Email requis." });
+    }
+
+    // Vérifier que l'email correspond à un utilisateur existant
+    const [users] = await pool.execute("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
+    if (users.length === 0) {
+      return res.status(400).json({ error: "Utilisateur non trouvé." });
+    }
+
+    // Générer un code aléatoire à 4 chiffres
+    const resetCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+    // Enregistrer le code et éventuellement une date d'expiration dans la base ou dans un cache associé (ex: Redis)
+    // Ici, pour simplifier, on peut l'enregistrer dans une table 'password_resets'
+    // Vous devrez créer cette table avec des colonnes email, code, expiration (exemple : expiration TIMESTAMP)
+
+    // Exemple d'insertion (à adapter selon votre structure)
+    await pool.execute(
+      `INSERT INTO password_resets (email, code, expiration)
+       VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE))
+       ON DUPLICATE KEY UPDATE code = VALUES(code), expiration = VALUES(expiration)`,
+      [email, resetCode]
+    );
+
+    // Envoyer le code par email (en utilisant nodemailer par exemple)
+    const transporter = nodemailer.createTransport({
+      // Configurez votre service d'envoi (ex: Gmail, SMTP, etc.)
+      service: "gmail",
+      auth: {
+        user: "mahhmoud004@gmail.com",
+        pass: "hqof fvsl lslk xxoa",
+      },
+    });
+
+    const mailOptions = {
+      from: "mahhmoud004@gmail.com",
+      to: email,
+      subject: "Réinitialisation de votre mot de passe",
+      text: `Votre code de réinitialisation est : ${resetCode}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "Code envoyé par email." });
+  } catch (error) {
+    console.error("Erreur lors de la demande de réinitialisation :", error);
+    res.status(500).json({
+      error:
+        "Erreur interne du serveur lors de la demande de réinitialisation.",
+    });
+  }
+});
+
+// Dans routes/auth.js
+
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+    if (!email || !code || !newPassword) {
+      return res.status(400).json({ error: "Tous les champs sont requis." });
+    }
+
+    // Récupérer le code enregistré pour cet email
+    const [rows] = await pool.execute(
+      "SELECT * FROM password_resets WHERE email = ? AND code = ? AND expiration > NOW()",
+      [email, code]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ error: "Code invalide ou expiré." });
+    }
+
+    // Hacher le nouveau mot de passe
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(newPassword, saltRounds);
+
+    // Mettre à jour le mot de passe de l'utilisateur
+    await pool.execute("UPDATE users SET passwordHash = ? WHERE email = ?", [
+      passwordHash,
+      email,
+    ]);
+
+    // Optionnel : Supprimer la demande de réinitialisation
+    await pool.execute("DELETE FROM password_resets WHERE email = ?", [email]);
+
+    res.status(200).json({ message: "Mot de passe réinitialisé avec succès." });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la réinitialisation du mot de passe :",
+      error
+    );
+    res.status(500).json({
+      error:
+        "Erreur interne du serveur lors de la réinitialisation du mot de passe.",
+    });
   }
 });
 
