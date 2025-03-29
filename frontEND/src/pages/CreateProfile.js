@@ -35,7 +35,7 @@ function CreateProfile() {
   };
   const handleMobile = (e) => {
     const fromattedPhoneNumber = formatPhoneNumber(e.target.value);
-    if (e.target.value.length > 14) return alert("votre numero est faux");
+    if (e.target.value.length > 14) return alert("votre numero est trop long");
     else return setMobile(fromattedPhoneNumber);
   };
 
