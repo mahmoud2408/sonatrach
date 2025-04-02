@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
+import React, { useState, useContext, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext"; // Assurez-vous que ce contexte gère bien l'état d'authentification
 
 const API_URL = "http://localhost:5005/api";
 
@@ -8,8 +8,38 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const { login } = useContext(AuthContext);
+  const { login, user } = useContext(AuthContext); // "user" contient les infos de l'utilisateur connecté
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Récupérer le paramètre "redirect" dans l'URL (si présent)
+  const queryParams = new URLSearchParams(location.search);
+  const redirectPath = queryParams.get("redirect") || "/";
+
+  // Vérifier si l'utilisateur est déjà connecté
+  useEffect(() => {
+    // Si l'utilisateur est déjà défini dans le contexte, redirigez directement
+    if (user && user.userId) {
+      navigate(redirectPath);
+    } else {
+      // Sinon, appelez l'endpoint /auth/me pour vérifier la session (optionnel si AuthContext se charge déjà de cela)
+      fetch(`${API_URL}/auth/me`, {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.userId) {
+            // Mettre à jour le contexte si nécessaire, puis rediriger
+            login({ userId: data.userId, role: data.role });
+            navigate(redirectPath);
+          }
+        })
+        .catch((error) => {
+          console.error("Erreur de vérification de session :", error);
+        });
+    }
+  }, [navigate, redirectPath, user, login]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,9 +53,11 @@ function Login() {
       const data = await response.json();
       console.log("Réponse de connexion :", data);
       if (response.ok) {
+        // Mettre à jour le contexte d'authentification
         login({ userId: data.userId, role: data.role });
         alert(`Connexion réussie, utilisateur ID : ${data.userId}`);
-        navigate("/");
+        // Redirection vers le chemin spécifié dans le paramètre "redirect"
+        navigate(redirectPath);
       } else {
         alert(`Erreur : ${data.error}`);
       }
@@ -75,7 +107,10 @@ function Login() {
             Vous avez oublié votre mot de passe ?
           </Link>
         </div>
-        <button type="submit" className="btn btn-primary w-100 btn-se-connecter">
+        <button
+          type="submit"
+          className="btn btn-primary w-100 btn-se-connecter"
+        >
           Se connecter
         </button>
       </form>

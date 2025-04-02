@@ -19,8 +19,18 @@ router.post("/profil", async (req, res) => {
       acceptNotifications,
     } = req.body;
 
-    if (!firstName || !lastName || !email || !username || !password || !isOver16 || !acceptTerms) {
-      return res.status(400).json({ error: "Tous les champs obligatoires ne sont pas renseignés." });
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !username ||
+      !password ||
+      !isOver16 ||
+      !acceptTerms
+    ) {
+      return res.status(400).json({
+        error: "Tous les champs obligatoires ne sont pas renseignés.",
+      });
     }
 
     const [existingUsers] = await pool.execute(
@@ -28,7 +38,9 @@ router.post("/profil", async (req, res) => {
       [email, username]
     );
     if (existingUsers.length > 0) {
-      return res.status(400).json({ error: "Un utilisateur avec cet email ou cet identifiant existe déjà." });
+      return res.status(400).json({
+        error: "Un utilisateur avec cet email ou cet identifiant existe déjà.",
+      });
     }
 
     const saltRounds = 10;
@@ -37,13 +49,28 @@ router.post("/profil", async (req, res) => {
     const [result] = await pool.execute(
       `INSERT INTO users (firstName, lastName, email, mobile, username, passwordHash, isOver16, acceptTerms, acceptNotifications, role)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [firstName, lastName, email, mobile, username, passwordHash, isOver16, acceptTerms, acceptNotifications, "user"]
+      [
+        firstName,
+        lastName,
+        email,
+        mobile,
+        username,
+        passwordHash,
+        isOver16,
+        acceptTerms,
+        acceptNotifications,
+        "user",
+      ]
     );
 
-    res.status(201).json({ message: "Profil créé avec succès.", userId: result.insertId });
+    res
+      .status(201)
+      .json({ message: "Profil créé avec succès.", userId: result.insertId });
   } catch (error) {
     console.error("Erreur lors de l'inscription:", error);
-    res.status(500).json({ error: "Erreur interne du serveur lors de l'inscription." });
+    res
+      .status(500)
+      .json({ error: "Erreur interne du serveur lors de l'inscription." });
   }
 });
 
@@ -73,10 +100,16 @@ router.post("/login", async (req, res) => {
       req.session.cookie.expires = false;
     }
 
-    res.status(200).json({ message: "Connexion réussie.", userId: user.id, role: user.role });
+    res.status(200).json({
+      message: "Connexion réussie.",
+      userId: user.id,
+      role: user.role,
+    });
   } catch (error) {
     console.error("Erreur lors de la connexion:", error);
-    res.status(500).json({ error: "Erreur interne du serveur lors de la connexion." });
+    res
+      .status(500)
+      .json({ error: "Erreur interne du serveur lors de la connexion." });
   }
 });
 
@@ -99,7 +132,9 @@ router.post("/request-reset", async (req, res) => {
     if (!email) {
       return res.status(400).json({ error: "Email requis." });
     }
-    const [users] = await pool.execute("SELECT * FROM users WHERE email = ?", [email]);
+    const [users] = await pool.execute("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
     if (users.length === 0) {
       return res.status(400).json({ error: "Utilisateur non trouvé." });
     }
@@ -127,7 +162,10 @@ router.post("/request-reset", async (req, res) => {
     res.status(200).json({ message: "Code envoyé par email." });
   } catch (error) {
     console.error("Erreur lors de la demande de réinitialisation :", error);
-    res.status(500).json({ error: "Erreur interne du serveur lors de la demande de réinitialisation." });
+    res.status(500).json({
+      error:
+        "Erreur interne du serveur lors de la demande de réinitialisation.",
+    });
   }
 });
 
@@ -147,12 +185,57 @@ router.post("/reset-password", async (req, res) => {
     }
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(newPassword, saltRounds);
-    await pool.execute("UPDATE users SET passwordHash = ? WHERE email = ?", [passwordHash, email]);
+    await pool.execute("UPDATE users SET passwordHash = ? WHERE email = ?", [
+      passwordHash,
+      email,
+    ]);
     await pool.execute("DELETE FROM password_resets WHERE email = ?", [email]);
     res.status(200).json({ message: "Mot de passe réinitialisé avec succès." });
   } catch (error) {
-    console.error("Erreur lors de la réinitialisation du mot de passe :", error);
-    res.status(500).json({ error: "Erreur interne du serveur lors de la réinitialisation du mot de passe." });
+    console.error(
+      "Erreur lors de la réinitialisation du mot de passe :",
+      error
+    );
+    res.status(500).json({
+      error:
+        "Erreur interne du serveur lors de la réinitialisation du mot de passe.",
+    });
+  }
+});
+
+// Dans routes/auth.js
+
+// Endpoint pour vérifier la session de l'utilisateur
+router.get("/me", async (req, res) => {
+  try {
+    if (req.session && req.session.userId) {
+      // Vous pouvez également renvoyer d'autres informations de l'utilisateur en effectuant une requête SQL
+      return res.status(200).json({ userId: req.session.userId });
+    }
+    return res.status(200).json({}); // Pas connecté
+  } catch (error) {
+    console.error("Erreur lors de la vérification de la session:", error);
+    res
+      .status(500)
+      .json({ error: "Erreur interne lors de la vérification de la session." });
+  }
+});
+
+// Dans routes/auth.js
+
+// Endpoint pour vérifier la session de l'utilisateur
+router.get("/me", async (req, res) => {
+  try {
+    if (req.session && req.session.userId) {
+      // Vous pouvez également renvoyer d'autres informations de l'utilisateur en effectuant une requête SQL
+      return res.status(200).json({ userId: req.session.userId });
+    }
+    return res.status(200).json({}); // Pas connecté
+  } catch (error) {
+    console.error("Erreur lors de la vérification de la session:", error);
+    res
+      .status(500)
+      .json({ error: "Erreur interne lors de la vérification de la session." });
   }
 });
 
