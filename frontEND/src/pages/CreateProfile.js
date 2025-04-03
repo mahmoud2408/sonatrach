@@ -1,5 +1,6 @@
 // frontend/src/pages/CreateProfile.js
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createProfile } from "../services/api"; // Chemin d'import à ajuster selon votre structure
 
 function CreateProfile() {
@@ -13,6 +14,7 @@ function CreateProfile() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptNotifications, setAcceptNotifications] = useState(false);
 
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -29,6 +31,7 @@ function CreateProfile() {
         acceptNotifications,
       });
       alert(`Profil créé avec succès, utilisateur ID : ${data.userId}`);
+      navigate("/");
     } catch (error) {
       alert(error.message);
     }
@@ -119,7 +122,7 @@ function CreateProfile() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            pattern="^[A-Za-z]{6,}\d*$"
+            pattern="^(?!\d)\S+$"
             title="le nom d'utilisateur doit commencer par des lettres et avoir au moins 6 caractères"
           />
         </div>
