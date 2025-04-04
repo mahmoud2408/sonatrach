@@ -32,11 +32,15 @@ const adminActivityRoutes = require("./routes/adminActivity");
 const adminMemberRoutes = require("./routes/adminMember");
 const publicActivityRoutes = require("./routes/publicActivity");
 const memberSubscriptionRoutes = require("./routes/memberSubscription");
+const usersRoutes = require("./routes/users");
+const emailRoutes = require("./routes/email");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminActivityRoutes);
 app.use("/api/admin", adminMemberRoutes);
 app.use("/api/activities", publicActivityRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/email", emailRoutes);
 app.use("/api/members", memberSubscriptionRoutes); // Ici se trouvent l'inscription et la récupération des membres
 
 app.listen(port, () => {

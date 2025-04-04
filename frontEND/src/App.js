@@ -70,6 +70,11 @@ function AppContent() {
                       Gérer Membres
                     </Link>
                   </li>
+                  <li className="nav-item ms-3">
+                    <Link className="nav-link nav-col" to="/send-mails">
+                      emails
+                    </Link>
+                  </li>
                 </>
               )}
             </ul>

@@ -3,3 +3,7 @@ frontEND/build/
 frontEND/public/
 frontEND/services/
 
+backEND/node_modules/
+backEND/config/
+.dist/
+
