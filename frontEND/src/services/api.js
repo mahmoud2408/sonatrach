@@ -64,12 +64,11 @@ export async function loginUser(loginData) {
   }
 }
 
-
 export async function getActivities() {
   try {
     const response = await axios.get("http://localhost:5005/api/activities", {
       withCredentials: true,
-      headers: { "Cache-Control": "no-cache" }
+      headers: { "Cache-Control": "no-cache" },
     });
     return response;
   } catch (error) {
@@ -77,7 +76,7 @@ export async function getActivities() {
   }
 }
 
-
 export function getMembers() {
-  return apiClient.get("/members");
+  // GET /api/members
+  return axios.get(`${API_URL}/members`, { withCredentials: true });
 }

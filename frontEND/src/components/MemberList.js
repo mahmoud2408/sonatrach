@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { getMembers } from '../services/api';
+// frontend/src/components/MemberList.js
+import React, { useEffect, useState } from "react";
+import { getMembers } from "../services/api";
 
 function MemberList() {
   const [members, setMembers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // Récupération initiale des membres via l’API
     getMembers()
       .then((res) => {
+        console.log("Membres récupérés:", res.data);
         setMembers(res.data);
       })
       .catch((err) => {
-        console.error('Erreur lors de la récupération des membres:', err);
+        console.error("Erreur lors de la récupération des membres:", err);
       });
   }, []);
 
-  // Filtrage des membres selon la saisie de l’utilisateur
+  // Filtrer sur la propriété 'nom'
   const filteredMembers = members.filter((member) =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase())
+    member.nom.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -39,16 +40,18 @@ function MemberList() {
         <thead className="table-dark">
           <tr>
             <th>Nom</th>
-            <th>Activities</th>
-            <th>Date d'Inscription</th>
+            <th>Catégorie</th>
+            <th>Email</th>
+            <th>Date d'inscription</th>
           </tr>
         </thead>
         <tbody>
           {filteredMembers.map((member) => (
             <tr key={member.id}>
-              <td>{member.name}</td>
-              <td>{member.category}</td>
-              <td>{member.isActive ? 'Actif' : 'Inactif'}</td>
+              <td>{member.nom}</td>
+              <td>{member.categorie}</td>
+              <td>{member.email}</td>
+              <td>{new Date(member.date_inscription).toLocaleDateString()}</td>
             </tr>
           ))}
         </tbody>

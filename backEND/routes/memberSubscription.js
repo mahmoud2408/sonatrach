@@ -48,6 +48,7 @@ router.post("/payer-abonnement", async (req, res) => {
 });
 
 // GET endpoint : récupérer la liste des membres inscrits
+// Cette route répondra à GET /api/members
 router.get("/", async (req, res) => {
   try {
     const [rows] = await pool.execute("SELECT * FROM membres");

@@ -1,5 +1,6 @@
 // frontend/src/pages/PaiementAbonnement.js
 import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../contexts/AuthContext";
 
@@ -7,10 +8,13 @@ function PaiementAbonnement() {
   const { user } = useContext(AuthContext);
   const [categorie, setCategorie] = useState("Standard");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handlePaiement = async () => {
+    // Si l'utilisateur n'est pas connecté, redirigez-le vers la page de connexion avec le paramètre redirect
     if (!user) {
       alert("Veuillez vous connecter !");
+      navigate("/login?redirect=/paiement-abonnement");
       return;
     }
     setLoading(true);
