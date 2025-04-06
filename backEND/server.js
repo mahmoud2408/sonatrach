@@ -1,11 +1,9 @@
-// backend/server.js
 const express = require("express");
 const session = require("express-session");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
 dotenv.config();
-
 const app = express();
 const port = process.env.PORT || 5005;
 
@@ -17,7 +15,6 @@ app.use(
 );
 
 app.use(express.json());
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -31,17 +28,17 @@ const authRoutes = require("./routes/auth");
 const adminActivityRoutes = require("./routes/adminActivity");
 const adminMemberRoutes = require("./routes/adminMember");
 const publicActivityRoutes = require("./routes/publicActivity");
+const users = require("./routes/users");
 const memberSubscriptionRoutes = require("./routes/memberSubscription");
-const usersRoutes = require("./routes/users");
-const emailRoutes = require("./routes/email");
+const adminAdminRoutes = require("./routes/adminAdmin"); // Nouveau routeur pour créer admin
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminActivityRoutes);
 app.use("/api/admin", adminMemberRoutes);
 app.use("/api/activities", publicActivityRoutes);
-app.use("/api/users", usersRoutes);
-app.use("/api/email", emailRoutes);
-app.use("/api/members", memberSubscriptionRoutes); // Ici se trouvent l'inscription et la récupération des membres
+app.use("/api/members", memberSubscriptionRoutes);
+app.use("/api/users", users); // Monte le routeur "users"
+app.use("/api/admin", adminAdminRoutes); // Monte le routeur "Créer Admin"
 
 app.listen(port, () => {
   console.log(`Serveur démarré sur http://localhost:${port}`);
