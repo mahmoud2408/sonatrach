@@ -1,10 +1,9 @@
 // frontend/src/App.js
 import React, { useContext } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import RoutesConfig from "./routes";
 import { AuthContext, AuthProvider } from "./contexts/AuthContext";
-import { Link } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -14,18 +13,11 @@ function AppContent() {
   const { t, i18n } = useTranslation();
   const { user, logout } = useContext(AuthContext);
 
-  const changeLanguage = (lang) => {
-    i18n.changeLanguage(lang);
-  };
-
   return (
     <BrowserRouter>
       <nav className="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div className="container">
-          <Link
-            className="navbar-brand d-flex align-items-center nav-col"
-            to="/"
-          >
+          <Link className="navbar-brand d-flex align-items-center nav-col" to="/">
             <img
               src={logo}
               alt="ASL SONATRACH Logo"
@@ -38,8 +30,11 @@ function AppContent() {
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
           >
-            <span className="navbar-toggler-icon" />
+            <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
@@ -71,11 +66,23 @@ function AppContent() {
                     </Link>
                   </li>
                   <li className="nav-item ms-3">
+                    <Link className="nav-link nav-col" to="/creer-admin">
+                      Créer Admin
+                    </Link>
+                  </li>
+                  <li className="nav-item ms-3">
                     <Link className="nav-link nav-col" to="/send-mails">
                       emails
                     </Link>
                   </li>
                 </>
+              )}
+              {user && user.role !== "admin" && (
+                <li className="nav-item ms-3">
+                  <Link className="nav-link nav-col" to="/paiement-abonnement">
+                    Payer Abonnement
+                  </Link>
+                </li>
               )}
             </ul>
             <ul className="navbar-nav ms-auto">
