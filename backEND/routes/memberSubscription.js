@@ -61,4 +61,23 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const [rows] = await pool.execute(
+      "SELECT id, user_id, nom, email, categorie, date_inscription, abonnement_expire FROM membres WHERE user_id = ?",
+      [userId]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Membre non trouvé." });
+    }
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    console.error("Erreur lors de la récupération du membre :", error);
+    res
+      .status(500)
+      .json({ error: "Erreur interne lors de la récupération du membre." });
+  }
+});
+
 module.exports = router;

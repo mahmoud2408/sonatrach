@@ -1,70 +1,60 @@
+// backend/routes/adminMember.js
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 const adminOnly = require("../middleware/adminOnly");
-const bcrypt = require("bcrypt");
 
-router.post("/member", adminOnly, async (req, res) => {
+// Endpoint pour récupérer la liste des membres depuis la table "membres"
+router.get("/members", adminOnly, async (req, res) => {
   try {
-    const { firstName, lastName, email, mobile, username, password } = req.body;
-    if (!firstName || !lastName || !email || !username || !password) {
-      return res.status(400).json({ error: "Tous les champs obligatoires ne sont pas renseignés." });
-    }
-    const [existingUsers] = await pool.execute(
-      "SELECT id FROM users WHERE email = ? OR username = ?",
-      [email, username]
+    const [members] = await pool.execute(
+      "SELECT id, user_id, nom, email, categorie, date_inscription, abonnement_expire FROM membres"
     );
-    if (existingUsers.length > 0) {
-      return res.status(400).json({ error: "Un utilisateur avec cet email ou cet identifiant existe déjà." });
-    }
-    const passwordHash = await bcrypt.hash(password, 10);
-    const [result] = await pool.execute(
-      `INSERT INTO users (firstName, lastName, email, mobile, username, passwordHash, isOver16, acceptTerms, acceptNotifications, role)
-       VALUES (?, ?, ?, ?, ?, ?, 1, 1, 0, 'user')`,
-      [firstName, lastName, email, mobile, username, passwordHash]
-    );
-    res.status(201).json({ message: "Membre ajouté", memberId: result.insertId });
+    console.log("Membres dans la table :", members);
+    res.status(200).json(members);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erreur lors de l'ajout du membre" });
+    console.error("Erreur lors de la récupération des membres :", error);
+    res
+      .status(500)
+      .json({ error: "Erreur lors de la récupération des membres" });
   }
 });
 
+// Endpoint pour modifier un membre dans la table "membres"
+// Ici, on suppose que seuls le nom, l'email et la catégorie sont modifiables.
 router.put("/member/:id", adminOnly, async (req, res) => {
   try {
-    const { id } = req.params;
-    const { firstName, lastName, email, mobile, username } = req.body;
+    const id = parseInt(req.params.id, 10);
+    const { nom, email, categorie } = req.body;
     await pool.execute(
-      "UPDATE users SET firstName = ?, lastName = ?, email = ?, mobile = ?, username = ? WHERE id = ?",
-      [firstName, lastName, email, mobile, username, id]
+      "UPDATE membres SET nom = ?, email = ?, categorie = ? WHERE id = ?",
+      [nom, email, categorie, id]
     );
-    res.status(200).json({ message: "Membre modifié" });
+    res.status(200).json({ message: "Membre mis à jour" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erreur lors de la modification du membre" });
+    console.error("Erreur lors de la mise à jour du membre :", error);
+    res.status(500).json({ error: "Erreur lors de la mise à jour du membre" });
   }
 });
 
+// Endpoint pour supprimer un membre de la table "membres"
 router.delete("/member/:id", adminOnly, async (req, res) => {
   try {
-    const { id } = req.params;
-    await pool.execute("DELETE FROM users WHERE id = ?", [id]);
-    res.status(200).json({ message: "Membre supprimé" });
+    const id = parseInt(req.params.id, 10);
+    console.log("Tentative de suppression pour l'id :", id);
+    const [result] = await pool.execute("DELETE FROM membres WHERE id = ?", [
+      id,
+    ]);
+    console.log("Résultat de la suppression :", result);
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Membre non trouvé ou déjà supprimé." });
+    }
+    res.status(200).json({ message: "Membre supprimé avec succès." });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erreur lors de la suppression du membre" });
-  }
-});
-
-router.put("/member/:id/renew", async (req, res) => {
-  try {
-    const { id } = req.params;
-    // Mettez à jour la date d'abonnement ; assurez-vous que la colonne subscription_date existe
-    await pool.execute("UPDATE users SET subscription_date = NOW() WHERE id = ?", [id]);
-    res.status(200).json({ message: "Abonnement renouvelé" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erreur lors du renouvellement de l'abonnement" });
+    console.error("Erreur lors de la suppression du membre :", error);
+    res.status(500).json({ error: "Erreur lors de la suppression du membre." });
   }
 });
 

@@ -19,6 +19,7 @@ import AdminMembers from "./pages/AdminMembers";
 import PaiementAbonnement from "./pages/PaiementAbonnement";
 import AdminRoute from "./components/AdminRoute";
 import EmailSender from "./pages/EmailSender";
+import MemberPage from "./pages/MemberPage";
 
 function RoutesConfig() {
   return (
@@ -37,6 +38,7 @@ function RoutesConfig() {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/paiement-abonnement" element={<PaiementAbonnement />} />
       <Route path="/send-mails" element={<EmailSender />} />
+      <Route path="/member" element={<MemberPage />} />
 
       {/* Routes réservées aux administrateurs */}
       <Route
