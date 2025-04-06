@@ -30,7 +30,8 @@ const adminActivityRoutes = require("./routes/adminActivity");
 const adminMemberRoutes = require("./routes/adminMember");
 const publicActivityRoutes = require("./routes/publicActivity");
 const memberSubscriptionRoutes = require("./routes/memberSubscription");
-const adminAdminRoutes = require("./routes/adminAdmin"); // Nouveau routeur pour créer admin
+const adminAdminRoutes = require("./routes/adminAdmin"); 
+const email=require("./routes/email")/// Nouveau routeur pour créer admin
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
@@ -38,6 +39,7 @@ app.use("/api/admin", adminActivityRoutes);
 app.use("/api/admin", adminMemberRoutes);
 app.use("/api/activities", publicActivityRoutes);
 app.use("/api/members", memberSubscriptionRoutes);
+app.use("/api/email", email); // Monte le routeur "email"
 app.use("/api/admin", adminAdminRoutes); // Monte le routeur "Créer Admin"
 
 app.listen(port, () => {
