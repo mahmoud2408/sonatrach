@@ -7,8 +7,8 @@ import Admin from './pages/Admin';
 import Members from './pages/Members';
 import Activities from './pages/Activities';
 import CreateProfile from './pages/CreateProfile';
-import TakeAppointment from './pages/TakeAppointment'; 
-import Login from './pages/Login'; 
+import TakeAppointment from './pages/TakeAppointment';
+import Login from './pages/Login';
 import BoutiqueEnLigne from './pages/BoutiqueEnLigne';
 import Prix from './components/Prix';
 import InscriptionActivite from './pages/InscriptionActivite';
@@ -18,6 +18,7 @@ import AdminActivities from './pages/AdminActivities';
 import AdminMembers from './pages/AdminMembers';
 import PaiementAbonnement from './pages/PaiementAbonnement';
 import CreerAdmin from './pages/CreerAdmin';
+import EmailSender from './pages/EmailSender';
 import AdminRoute from './components/AdminRoute';
 
 function RoutesConfig() {
@@ -37,6 +38,7 @@ function RoutesConfig() {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/paiement-abonnement" element={<PaiementAbonnement />} />
       <Route path="/creer-admin" element={<CreerAdmin />} />
+      <Route path="/send-mails" element={<EmailSender />} />
 
       {/* Routes réservées aux administrateurs */}
       <Route
