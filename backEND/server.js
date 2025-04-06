@@ -25,6 +25,7 @@ app.use(
 );
 
 const authRoutes = require("./routes/auth");
+const usersRoutes = require("./routes/users");
 const adminActivityRoutes = require("./routes/adminActivity");
 const adminMemberRoutes = require("./routes/adminMember");
 const publicActivityRoutes = require("./routes/publicActivity");
@@ -32,6 +33,7 @@ const memberSubscriptionRoutes = require("./routes/memberSubscription");
 const adminAdminRoutes = require("./routes/adminAdmin"); // Nouveau routeur pour créer admin
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
 app.use("/api/admin", adminActivityRoutes);
 app.use("/api/admin", adminMemberRoutes);
 app.use("/api/activities", publicActivityRoutes);
