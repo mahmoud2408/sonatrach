@@ -131,6 +131,7 @@ function EmailSender() {
           <option value="members">Membres</option>
           <option value="non-members">Non membres</option>
           <option value="notif">notification</option>
+          <option value="sonatrach">sonatrach</option>
         </select>
       </div>
 

@@ -90,8 +90,14 @@ router.post("/login", async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ error: "Mot de passe incorrect." });
     }
+    const [members] = await pool.execute(
+      "SELECT id FROM membres WHERE email = ?",
+      [user.email]
+    );
+    const isMembre = members.length > 0;
 
     req.session.userId = user.id;
+    req.session.isMembre = isMembre;
     req.session.role = user.role; // On stocke le rôle
 
     if (rememberMe) {
@@ -99,11 +105,13 @@ router.post("/login", async (req, res) => {
     } else {
       req.session.cookie.expires = false;
     }
+    console.log("login,isMembre=", isMembre);
 
     res.status(200).json({
       message: "Connexion réussie.",
       userId: user.id,
       role: user.role,
+      isMembre,
     });
   } catch (error) {
     console.error("Erreur lors de la connexion:", error);
@@ -208,9 +216,11 @@ router.post("/reset-password", async (req, res) => {
 // Endpoint pour vérifier la session de l'utilisateur
 router.get("/me", async (req, res) => {
   try {
-    if (req.session && req.session.userId) {
+    if (req.session && req.session.userId && req.session.isMembre) {
       // Vous pouvez également renvoyer d'autres informations de l'utilisateur en effectuant une requête SQL
-      return res.status(200).json({ userId: req.session.userId });
+      return res
+        .status(200)
+        .json({ userId: req.session.userId, isMembre: req.session.isMembre });
     }
     return res.status(200).json({}); // Pas connecté
   } catch (error) {
@@ -224,19 +234,5 @@ router.get("/me", async (req, res) => {
 // Dans routes/auth.js
 
 // Endpoint pour vérifier la session de l'utilisateur
-router.get("/me", async (req, res) => {
-  try {
-    if (req.session && req.session.userId) {
-      // Vous pouvez également renvoyer d'autres informations de l'utilisateur en effectuant une requête SQL
-      return res.status(200).json({ userId: req.session.userId });
-    }
-    return res.status(200).json({}); // Pas connecté
-  } catch (error) {
-    console.error("Erreur lors de la vérification de la session:", error);
-    res
-      .status(500)
-      .json({ error: "Erreur interne lors de la vérification de la session." });
-  }
-});
 
 module.exports = router;

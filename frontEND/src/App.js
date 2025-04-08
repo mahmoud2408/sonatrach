@@ -1,5 +1,5 @@
 // frontend/src/App.js
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { BrowserRouter, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import RoutesConfig from "./routes";
@@ -12,12 +12,17 @@ import logo from "./assets/logo.png";
 function AppContent() {
   const { t, i18n } = useTranslation();
   const { user, logout } = useContext(AuthContext);
-
+  useEffect(() => {
+    console.log("Utilisateur connecté :", user);
+  }, [user]);
   return (
     <BrowserRouter>
       <nav className="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div className="container">
-          <Link className="navbar-brand d-flex align-items-center nav-col" to="/">
+          <Link
+            className="navbar-brand d-flex align-items-center nav-col"
+            to="/"
+          >
             <img
               src={logo}
               alt="ASL SONATRACH Logo"
@@ -48,11 +53,25 @@ function AppContent() {
                   {t("navbar.activities")}
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link nav-col" to="/members">
-                  {t("navbar.members")}
-                </Link>
-              </li>
+              {user &&
+                user.role !== "admin" &&
+                (user.isMembre ? (
+                  <li className="nav-item ms-3">
+                    <Link className="nav-link nav-col" to="/member">
+                      info membre
+                    </Link>
+                  </li>
+                ) : (
+                  <li className="nav-item ms-3">
+                    <Link
+                      className="nav-link nav-col"
+                      to="/paiement-abonnement"
+                    >
+                      Payer Abonnement
+                    </Link>
+                  </li>
+                ))}
+
               {user && user.role === "admin" && (
                 <>
                   <li className="nav-item ms-3">
@@ -76,13 +95,6 @@ function AppContent() {
                     </Link>
                   </li>
                 </>
-              )}
-              {user && user.role !== "admin" && (
-                <li className="nav-item ms-3">
-                  <Link className="nav-link nav-col" to="/paiement-abonnement">
-                    Payer Abonnement
-                  </Link>
-                </li>
               )}
             </ul>
             <ul className="navbar-nav ms-auto">
@@ -115,9 +127,12 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    console.log("App"),
+    (
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    )
   );
 }
 

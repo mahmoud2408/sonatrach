@@ -14,10 +14,22 @@ router.post("/payer-abonnement", async (req, res) => {
     }
     // Vérifier si l'utilisateur est déjà membre
     const [existing] = await pool.execute(
-      "SELECT id FROM membres WHERE user_id = ?",
+      "SELECT id,categorie FROM membres WHERE user_id = ?",
       [user_id]
     );
-    if (existing.length > 0) {
+    if (
+      existing.length > 0 &&
+      existing[0].categorie === "premium" &&
+      categorie === "ameliorer"
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Cet utilisateur est déjà Premium." });
+    } else if (
+      existing.length > 0 &&
+      existing[0].categorie !== "standard" &&
+      (categorie === "Standard" || categorie === "Premium")
+    ) {
       return res
         .status(400)
         .json({ error: "Cet utilisateur est déjà membre." });
@@ -32,13 +44,21 @@ router.post("/payer-abonnement", async (req, res) => {
     }
     const { firstName, lastName, email } = userRows[0];
     // Insérer l'utilisateur dans la table membres
-    await pool.execute(
-      "INSERT INTO membres (user_id, nom, email, categorie, date_inscription, abonnement_expire) VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR))",
-      [user_id, `${firstName} ${lastName}`, email, categorie]
-    );
-    res
-      .status(201)
-      .json({ message: "Abonnement payé et membre ajouté avec succès." });
+    if (categorie === "ameliorer") {
+      await pool.execute(
+        "UPDATE membres SET categorie = 'premium' WHERE user_id = ?",
+        [user_id]
+      );
+      return res.status(200).json({ message: "Membre Premium ajouté." });
+    } else {
+      await pool.execute(
+        "INSERT INTO membres (user_id, nom, email, categorie, date_inscription, abonnement_expire) VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR))",
+        [user_id, `${firstName} ${lastName}`, email, categorie]
+      );
+      res
+        .status(201)
+        .json({ message: "Abonnement payé et membre ajouté avec succès." });
+    }
   } catch (error) {
     console.error("Erreur lors du paiement de l'abonnement :", error);
     res

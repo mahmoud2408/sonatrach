@@ -140,8 +140,8 @@ function CreateProfile() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            pattern="(?=.*[a-z])(?=.*[A-Z]).{8,}"
-            title="Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule et une lettre minuscule"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
+            title="Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule et une lettre minuscule et un caractère spécial"
           />
         </div>
 

@@ -49,6 +49,9 @@ function PaiementAbonnement() {
               value={categorie}
               onChange={(e) => setCategorie(e.target.value)}
             >
+              <option value="ameliorer">
+                ameliorer abonnement - 1500 DA/mois
+              </option>
               <option value="Standard">Standard - 1500 DA/mois</option>
               <option value="Premium">Premium - 3000 DA/mois</option>
             </select>

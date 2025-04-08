@@ -27,6 +27,12 @@ router.get("/emails", async (req, res) => {
         FROM users
         WHERE acceptNotifications = 1
       `;
+    } else if (filter === "sonatrach") {
+      query = `
+            SELECT email
+           FROM users
+           WHERE email LIKE '%@sonatrach.dz'
+         `;
     }
 
     const [rows] = await pool.execute(query);
