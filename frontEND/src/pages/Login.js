@@ -31,7 +31,11 @@ function Login() {
         .then((data) => {
           if (data.userId) {
             // Mettre à jour le contexte si nécessaire, puis rediriger
-            login({ userId: data.userId, role: data.role });
+            login({
+              userId: data.userId,
+              role: data.role,
+              isMembre: data.isMembre,
+            });
             navigate(redirectPath);
           }
         })
@@ -54,7 +58,11 @@ function Login() {
       console.log("Réponse de connexion :", data);
       if (response.ok) {
         // Mettre à jour le contexte d'authentification
-        login({ userId: data.userId, role: data.role });
+        login({
+          userId: data.userId,
+          role: data.role,
+          isMembre: data.isMembre,
+        });
         alert(`Connexion réussie, utilisateur ID : ${data.userId}`);
         // Redirection vers le chemin spécifié dans le paramètre "redirect"
         navigate(redirectPath);

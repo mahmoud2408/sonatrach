@@ -6,9 +6,9 @@ const pool = require("../config/db");
 // Corps attendu : { nom, prenom, age, relation, activite }
 router.post("/", async (req, res) => {
   try {
-    const { nom, prenom, age, relation, activite } = req.body;
+    const { nom, prenom, age, relation, activite, currentUserId } = req.body;
     // Vérifier la présence de tous les champs
-    if (!nom || !prenom || !age || !relation || !activite) {
+    if (!nom || !prenom || !age || !relation || !activite || !currentUserId) {
       return res.status(400).json({ error: "Tous les champs sont requis." });
     }
     // Vérifier que l'activité existe
@@ -21,8 +21,8 @@ router.post("/", async (req, res) => {
     }
     // Insérer l'inscription
     await pool.execute(
-      `INSERT INTO inscriptions (nom, prenom, age, relation, activity_id)
-       VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO inscriptions (nom, prenom, age, relation, activity_id, user_id)
+       VALUES (?, ?, ?, ?, ?,?)`,
       [nom, prenom, age, relation, activite]
     );
     res

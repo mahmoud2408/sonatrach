@@ -42,6 +42,7 @@ function InscriptionActivite() {
           age,
           relation: membre,
           activite,
+          currentUserId: localStorage.getItem("userId"),
         }),
       });
       const data = await res.json();
@@ -124,7 +125,7 @@ function InscriptionActivite() {
               <option value="">-- Sélectionnez une activité --</option>
               {activities.map((act) => (
                 <option key={act.id} value={act.id}>
-                  {act.name || act.nom || act.titre}
+                  {act.title}
                 </option>
               ))}
             </select>
