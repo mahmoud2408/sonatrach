@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
+const sonatrachPool = require("../config/sonatrachDb"); // DB Sonatrach
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 
@@ -94,11 +95,13 @@ router.post("/login", async (req, res) => {
       "SELECT id FROM membres WHERE email = ?",
       [user.email]
     );
-    const isMembre = members.length > 0;
+    let isMembre = members.length > 0;
+    const sonatrach = false; // On indique que ce n'est pas un utilisateur Sonatrach
 
     req.session.userId = user.id;
     req.session.isMembre = isMembre;
     req.session.role = user.role; // On stocke le rôle
+    req.session.sonatrach = false; // On indique que ce n'est pas un utilisateur Sonatrach
 
     if (rememberMe) {
       req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
@@ -112,6 +115,7 @@ router.post("/login", async (req, res) => {
       userId: user.id,
       role: user.role,
       isMembre,
+      sonatrach,
     });
   } catch (error) {
     console.error("Erreur lors de la connexion:", error);
@@ -228,6 +232,54 @@ router.get("/me", async (req, res) => {
     res
       .status(500)
       .json({ error: "Erreur interne lors de la vérification de la session." });
+  }
+});
+
+router.post("/sonatrach-login", async (req, res) => {
+  try {
+    const { login, password } = req.body;
+    // On interroge la table `user` de la DB sonatrach
+    const [users] = await sonatrachPool.execute(
+      "SELECT * FROM users WHERE email = ? OR username = ?",
+      [login, login]
+    );
+    if (users.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "Utilisateur Sonatrach non trouvé." });
+    }
+    const user = users[0];
+    // Si la colonne passwordHash existe là-bas
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Mot de passe incorrect." });
+    }
+
+    // À partir d’ici, on se comporte comme un utilisateur « normal » :
+    // On peut vérifier s’il est membre dans la DB principale
+    const [members] = await pool.execute(
+      "SELECT id FROM membres WHERE email = ?",
+      [user.email]
+    );
+    let isMembre = members.length > 0;
+    const sonatrach = true; // On indique que c'est un utilisateur Sonatrach
+
+    // On stocke en session
+    req.session.userId = user.id;
+    req.session.isMembre = isMembre;
+    req.session.role = user.role || "user";
+    req.session.sonatrach = true; // flag pour indiquer le mode Sonatrach
+
+    res.json({
+      message: "Connexion Sonatrach réussie.",
+      userId: user.id,
+      role: req.session.role,
+      isMembre,
+      sonatrach,
+    });
+  } catch (err) {
+    console.error("Erreur Sonatrach-login:", err);
+    res.status(500).json({ error: "Erreur interne Sonatrach-login." });
   }
 });
 

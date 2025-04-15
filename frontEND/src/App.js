@@ -10,7 +10,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import logo from "./assets/logo.png";
 
 function AppContent() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, logout } = useContext(AuthContext);
   useEffect(() => {
     console.log("Utilisateur connecté :", user);

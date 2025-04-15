@@ -21,6 +21,7 @@ import AdminRoute from "./components/AdminRoute";
 import EmailSender from "./pages/EmailSender";
 import CreerAdmin from "./pages/CreerAdmin";
 import MemberPage from "./pages/MemberPage";
+import LoginSonatrach from "./pages/LoginSonatrach";
 
 function RoutesConfig() {
   return (
@@ -38,6 +39,7 @@ function RoutesConfig() {
       <Route path="/inscription-activite" element={<InscriptionActivite />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/creer-admin" element={<CreerAdmin />} />
+      <Route path="/login-sonatrach" element={<LoginSonatrach />} />
       <Route path="/paiement-abonnement" element={<PaiementAbonnement />} />
       <Route path="/send-mails" element={<EmailSender />} />
       <Route path="/member" element={<MemberPage />} />

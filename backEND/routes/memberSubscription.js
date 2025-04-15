@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
+const sonatrachPool = require("../config/sonatrachDb");
 
 // POST endpoint : Simuler le paiement et inscrire l'utilisateur dans la table membres
 router.post("/payer-abonnement", async (req, res) => {
@@ -35,7 +36,8 @@ router.post("/payer-abonnement", async (req, res) => {
         .json({ error: "Cet utilisateur est déjà membre." });
     }
     // Récupérer les informations de l'utilisateur depuis la table users
-    const [userRows] = await pool.execute(
+    const db = req.session.sonatrach ? sonatrachPool : pool;
+    const [userRows] = await db.execute(
       "SELECT firstName, lastName, email FROM users WHERE id = ?",
       [user_id]
     );
@@ -55,6 +57,8 @@ router.post("/payer-abonnement", async (req, res) => {
         "INSERT INTO membres (user_id, nom, email, categorie, date_inscription, abonnement_expire) VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR))",
         [user_id, `${firstName} ${lastName}`, email, categorie]
       );
+      req.session.isMembre = true; // Mettre à jour la session de l'utilisateur
+      req.session.categorie = categorie; // Mettre à jour la catégorie dans la session
       res
         .status(201)
         .json({ message: "Abonnement payé et membre ajouté avec succès." });

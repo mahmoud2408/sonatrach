@@ -1,13 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
+const sonatrachPool = require("../config/sonatrachDb");
 
 router.get("/emails", async (req, res) => {
   try {
     const filter = req.query.filter; // Peut être "members", "non-members" ou "all" (ou non défini)
     let query = "SELECT email FROM users";
     // Selon le filtre, on modifie la requête SQL :
-    if (filter === "members") {
+
+    if (filter === "sonatrach") {
+      query = `
+            SELECT email
+           FROM users
+         `;
+      const [rows1] = await sonatrachPool.execute(query);
+      const emails = rows1.map((row) => row.email);
+      return res.status(200).json(emails);
+    } else if (filter === "members") {
       // Récupère uniquement les emails des utilisateurs qui sont membres
       query = `
         SELECT email
@@ -27,12 +37,6 @@ router.get("/emails", async (req, res) => {
         FROM users
         WHERE acceptNotifications = 1
       `;
-    } else if (filter === "sonatrach") {
-      query = `
-            SELECT email
-           FROM users
-           WHERE email LIKE '%@sonatrach.dz'
-         `;
     }
 
     const [rows] = await pool.execute(query);

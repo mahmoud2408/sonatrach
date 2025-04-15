@@ -35,6 +35,7 @@ function Login() {
               userId: data.userId,
               role: data.role,
               isMembre: data.isMembre,
+              sonatrach: data.sonatrach,
             });
             navigate(redirectPath);
           }
@@ -62,6 +63,7 @@ function Login() {
           userId: data.userId,
           role: data.role,
           isMembre: data.isMembre,
+          sonatrach: data.sonatrach,
         });
         alert(`Connexion réussie, utilisateur ID : ${data.userId}`);
         // Redirection vers le chemin spécifié dans le paramètre "redirect"
@@ -114,6 +116,13 @@ function Login() {
           <Link to="/reset-password" className="ms-2">
             Vous avez oublié votre mot de passe ?
           </Link>
+          <button
+            type="button"
+            className="btn btn-secondary w-100 mt-2"
+            onClick={() => navigate("/login-sonatrach")}
+          >
+            Connexion Sonatrach
+          </button>
         </div>
         <button
           type="submit"
