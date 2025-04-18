@@ -32,7 +32,7 @@ const users = require("./routes/users");
 const email = require("./routes/email");
 const memberSubscriptionRoutes = require("./routes/memberSubscription");
 const inscriptionRoutes = require("./routes/inscription");
-
+const trainerRoutes = require("./routes/trainers");
 const adminAdminRoutes = require("./routes/adminAdmin"); // Nouveau routeur pour créer admin
 
 app.use("/api/auth", authRoutes);
@@ -42,6 +42,7 @@ app.use("/api/inscriptions", inscriptionRoutes);
 app.use("/api/email", email); // Monte le routeur "email"
 app.use("/api/activities", publicActivityRoutes);
 app.use("/api/members", memberSubscriptionRoutes);
+app.use("/api/admin/trainers", trainerRoutes);
 app.use("/api/users", users); // Monte le routeur "users"
 app.use("/api/admin", adminAdminRoutes); // Monte le routeur "Créer Admin"
 

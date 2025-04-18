@@ -22,7 +22,7 @@ import EmailSender from "./pages/EmailSender";
 import CreerAdmin from "./pages/CreerAdmin";
 import MemberPage from "./pages/MemberPage";
 import LoginSonatrach from "./pages/LoginSonatrach";
-import Navbar from "./pages/Navbar";
+import CreateTrainers from "./pages/CreateTrainer";
 
 function RoutesConfig() {
   return (
@@ -34,6 +34,7 @@ function RoutesConfig() {
       <Route path="/profil" element={<CreateProfile />} />
       <Route path="/rendezvous" element={<TakeAppointment />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/create-trainer" element={<CreateTrainers />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/boutique-en-ligne" element={<BoutiqueEnLigne />} />
       <Route path="/prix" element={<Prix />} />

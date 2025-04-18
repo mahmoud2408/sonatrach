@@ -1,17 +1,19 @@
 // frontend/src/components/ActivitiesTable.js
-import React, { useEffect, useState } from 'react';
-import { getActivities } from '../services/api';
+import React, { useEffect, useState } from "react";
+import { getActivities } from "../services/api";
 
 function ActivitiesTable() {
   const [activities, setActivities] = useState([]);
 
   useEffect(() => {
     getActivities()
-      .then(res => {
-         console.log("Activités récupérées :", res.data);
-         setActivities(res.data);
+      .then((res) => {
+        console.log("Activités récupérées :", res.data);
+        setActivities(res.data);
       })
-      .catch(err => console.error("Erreur lors du chargement des activités:", err));
+      .catch((err) =>
+        console.error("Erreur lors du chargement des activités:", err)
+      );
   }, []);
 
   return (
@@ -24,20 +26,32 @@ function ActivitiesTable() {
           <thead className="table-dark">
             <tr>
               <th>Activité</th>
+              <th>Entraîneur</th>
               <th>Date</th>
               <th>Heure</th>
               <th>Nombre de Membres</th>
             </tr>
           </thead>
           <tbody>
-            {activities.map(activity => (
-              <tr key={activity.id}>
-                <td>{activity.title}</td>
-                <td>{activity.date}</td>
-                <td>{activity.hour}</td>
-                <td>{activity.membersCount || 0}</td>
-              </tr>
-            ))}
+            {activities.map((activity) => {
+              // Si votre API renvoie trainerName, on l'affiche.
+              // Sinon on combine trainerFirstName + trainerLastName.
+              const trainer =
+                activity.trainerName ??
+                (activity.trainerFirstName && activity.trainerLastName
+                  ? `${activity.trainerFirstName} ${activity.trainerLastName}`
+                  : "—");
+
+              return (
+                <tr key={activity.id}>
+                  <td>{activity.title}</td>
+                  <td>{trainer}</td>
+                  <td>{activity.date}</td>
+                  <td>{activity.hour}</td>
+                  <td>{activity.membersCount ?? 0}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

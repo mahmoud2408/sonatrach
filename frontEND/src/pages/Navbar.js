@@ -74,6 +74,11 @@ function Navbar() {
                     emails
                   </Link>
                 </li>
+                <li className="nav-item ms-3">
+                  <Link className="nav-link nav-col" to="/create-trainer">
+                    créer entraineur
+                  </Link>
+                </li>
               </>
             )}
           </ul>
