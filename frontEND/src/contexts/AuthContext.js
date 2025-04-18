@@ -1,5 +1,6 @@
 // frontend/src/contexts/AuthContext.js
 import React, { createContext, useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 
 export const AuthContext = createContext(null);
 
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }) => {
         method: "POST",
         credentials: "include",
       });
+      Navigate("/");
     } catch (error) {
       console.error("Erreur lors de la déconnexion :", error);
     }

@@ -22,6 +22,7 @@ import EmailSender from "./pages/EmailSender";
 import CreerAdmin from "./pages/CreerAdmin";
 import MemberPage from "./pages/MemberPage";
 import LoginSonatrach from "./pages/LoginSonatrach";
+import Navbar from "./pages/Navbar";
 
 function RoutesConfig() {
   return (

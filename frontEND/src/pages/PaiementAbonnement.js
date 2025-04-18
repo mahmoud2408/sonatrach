@@ -3,9 +3,10 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../contexts/AuthContext";
+import Login from "./Login";
 
 function PaiementAbonnement() {
-  const { user } = useContext(AuthContext);
+  const { user, login } = useContext(AuthContext);
   const [categorie, setCategorie] = useState("Standard");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ function PaiementAbonnement() {
         { user_id: user.userId, categorie },
         { withCredentials: true }
       );
+      login({ user, role: user.role, isMembre: true }); // Mettez à jour le contexte d'authentification
+      console.log("Réponse de paiement :", response.data);
       alert(response.data.message);
     } catch (error) {
       console.error("Erreur lors de l'inscription en tant que membre :", error);

@@ -1,16 +1,50 @@
 // frontend/src/pages/LoginSonatrach.js
-import React, { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5005/api";
 
 export default function LoginSonatrach() {
+  const { user } = useContext(AuthContext);
   const [loginField, setLoginField] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const redirectPath = queryParams.get("redirect") || "/";
+
+  useEffect(() => {
+    // Si l'utilisateur est déjà défini dans le contexte, redirigez directement
+    if (user && user.userId) {
+      navigate(redirectPath);
+    } else {
+      // Sinon, appelez l'endpoint /auth/me pour vérifier la session (optionnel si AuthContext se charge déjà de cela)
+      fetch(`${API_URL}/auth/me`, {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.userId) {
+            // Mettre à jour le contexte si nécessaire, puis rediriger
+            login({
+              userId: data.userId,
+              role: data.role,
+              isMembre: data.isMembre,
+              sonatrach: data.sonatrach,
+            });
+            navigate(redirectPath);
+          }
+        })
+        .catch((error) => {
+          console.error("Erreur de vérification de session :", error);
+        });
+    }
+  }, [navigate, redirectPath, user, login]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,7 +72,7 @@ export default function LoginSonatrach() {
         sonatrach: data.sonatrach,
       });
       // redirige vers la home ou une route protégée
-      navigate("/");
+      navigate(redirectPath);
     } catch (err) {
       console.error("Erreur Sonatrach-login :", err);
       setError("Erreur réseau lors de la connexion");
@@ -88,4 +122,3 @@ export default function LoginSonatrach() {
     </div>
   );
 }
-
