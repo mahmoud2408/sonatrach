@@ -55,7 +55,7 @@ function Navbar() {
             {user && user.role === "entraineur" && (
               <>
                 <li className="nav-item ms-3">
-                  <Link className="nav-link" to="/trainer/activities">
+                  <Link className="nav-link nav-col" to="/trainer/activities">
                     Mes Activités
                   </Link>
                 </li>

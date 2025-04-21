@@ -46,7 +46,7 @@ function ActivitiesTable() {
                 <tr key={activity.id}>
                   <td>{activity.title}</td>
                   <td>{trainer}</td>
-                  <td>{activity.date}</td>
+                  <td>{new Date(activity.date).toLocaleDateString("fr-FR")}</td>
                   <td>{activity.hour}</td>
                   <td>{activity.membersCount ?? 0}</td>
                 </tr>

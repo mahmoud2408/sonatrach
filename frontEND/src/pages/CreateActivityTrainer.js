@@ -184,7 +184,7 @@ export default function TrainerActivities() {
               {activities.map((act) => (
                 <tr key={act.id}>
                   <td>{act.title}</td>
-                  <td>{act.date}</td>
+                  <td>{new Date(activity.date).toLocaleDateString("fr-FR")}</td>
                   <td>{act.hour}</td>
                   <td>{act.description}</td>
                   <td>

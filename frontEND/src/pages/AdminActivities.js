@@ -209,7 +209,7 @@ export default function AdminActivities() {
                     className="form-control"
                   />
                 ) : (
-                  activity.date
+                  new Date(activity.date).toLocaleDateString('fr-FR')
                 )}
               </td>
               <td>
