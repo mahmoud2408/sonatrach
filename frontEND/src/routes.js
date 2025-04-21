@@ -23,7 +23,7 @@ import CreerAdmin from "./pages/CreerAdmin";
 import MemberPage from "./pages/MemberPage";
 import LoginSonatrach from "./pages/LoginSonatrach";
 import CreateTrainers from "./pages/CreateTrainer";
-import CreateActivityTrainer from "./pages/CreateActivityTrainer";
+import TrainerActivities from "./pages/CreateActivityTrainer";
 
 function RoutesConfig() {
   return (
@@ -39,7 +39,7 @@ function RoutesConfig() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/boutique-en-ligne" element={<BoutiqueEnLigne />} />
       <Route path="/prix" element={<Prix />} />
-      <Route path="/trainer/activity" element={<CreateActivityTrainer />} />
+      <Route path="/trainer/activities" element={<TrainerActivities />} />
       <Route path="/inscription-activite" element={<InscriptionActivite />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/creer-admin" element={<CreerAdmin />} />

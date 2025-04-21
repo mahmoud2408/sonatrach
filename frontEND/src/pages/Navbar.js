@@ -52,6 +52,16 @@ function Navbar() {
 
             <AboReset />
 
+            {user && user.role === "entraineur" && (
+              <>
+                <li className="nav-item ms-3">
+                  <Link className="nav-link" to="/trainer/activities">
+                    Mes Activités
+                  </Link>
+                </li>
+              </>
+            )}
+
             {user && user.role === "admin" && (
               <>
                 <li className="nav-item ms-3">
