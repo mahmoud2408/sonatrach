@@ -131,6 +131,7 @@ router.delete("/activity/:id", adminOnly, async (req, res) => {
 });
 // Ajoutez cette route si elle n'existe pas déjà
 // Dans adminActivity.js (backend)
+// Dans adminActivity.js
 router.get("/activities", async (req, res) => {
   try {
     const [rows] = await pool.execute(`

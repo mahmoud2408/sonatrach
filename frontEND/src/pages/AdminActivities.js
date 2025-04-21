@@ -1,6 +1,7 @@
 // frontend/src/pages/AdminActivities.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { getActivities } from "../services/api";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5005/api";
 
@@ -17,16 +18,14 @@ export default function AdminActivities() {
   const [editingActivity, setEditingActivity] = useState(null);
 
   useEffect(() => {
-    // Charger activités
-    axios
-      .get(`${API_URL}/activities`, { withCredentials: true })
-      .then((res) => setActivities(res.data))
-      .catch((err) => console.error("Fetch activities error:", err));
-    // Charger entraîneurs
-    axios
-      .get(`${API_URL}/admin/trainers`, { withCredentials: true })
-      .then((res) => setTrainers(res.data))
-      .catch((err) => console.error("Fetch trainers error:", err));
+    getActivities()
+      .then((res) => {
+        console.log("Activités récupérées :", res.data);
+        setActivities(res.data);
+      })
+      .catch((err) =>
+        console.error("Erreur lors du chargement des activités:", err)
+      );
   }, []);
 
   const handleAddActivity = async () => {
@@ -249,36 +248,26 @@ export default function AdminActivities() {
               <td>
                 {editingActivity && editingActivity.id === activity.id ? (
                   <select
-                    className="form-select mb-2"
-                    value={newActivity.trainerId}
+                    className="form-select"
+                    value={editingActivity.trainerId}
                     onChange={(e) =>
-                      setNewActivity({
-                        ...newActivity,
+                      setEditingActivity({
+                        ...editingActivity,
                         trainerId: e.target.value,
                       })
                     }
-                    required
                   >
-                    <option value="">-- Sélectionnez un entraîneur --</option>{" "}
-                    {/* Correction du texte */}
+                    <option value="">-- Sélectionnez --</option>
                     {trainers.map((t) => (
-                      <option key={t?.id} value={t?.id}>
-                        {t?.firstName} {t?.lastName}{" "}
-                        {/* Vérification optionnelle */}
+                      <option key={t.id} value={t.id}>
+                        {t.firstName} {t.lastName}
                       </option>
                     ))}
                   </select>
                 ) : (
-                  () => {
-                    const trainer = trainers.find(
-                      (t) => t?.id === activity.trainerId
-                    ); // Trouver une fois
-                    return trainer ? (
-                      `${trainer.firstName} ${trainer.lastName}`
-                    ) : (
-                      <span className="text-muted">– Non assigné –</span>
-                    );
-                  }
+                  activity.trainerName || (
+                    <span className="text-muted">– Non assigné –</span>
+                  )
                 )}
               </td>
               <td>
