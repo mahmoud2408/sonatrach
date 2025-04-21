@@ -7,7 +7,7 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5005/api";
 
 export default function AdminActivities() {
   const [activities, setActivities] = useState([]);
-  const [trainers, setTrainers] = useState([]);
+  const [trainers] = useState([]);
   const [newActivity, setNewActivity] = useState({
     title: "",
     date: "",
@@ -209,7 +209,7 @@ export default function AdminActivities() {
                     className="form-control"
                   />
                 ) : (
-                  new Date(activity.date).toLocaleDateString('fr-FR')
+                  new Date(activity.date).toLocaleDateString("fr-FR")
                 )}
               </td>
               <td>
