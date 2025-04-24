@@ -7,7 +7,7 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5005/api";
 
 export default function AdminActivities() {
   const [activities, setActivities] = useState([]);
-  const [trainers] = useState([]);
+  const [trainers, setTrainers] = useState([]);
   const [newActivity, setNewActivity] = useState({
     title: "",
     date: "",
@@ -26,6 +26,12 @@ export default function AdminActivities() {
       .catch((err) =>
         console.error("Erreur lors du chargement des activités:", err)
       );
+    axios
+      .get(`${API_URL}/admin/trainers`, { withCredentials: true })
+      .then((res) => {
+        setTrainers(res.data); // ← on remplit trainers
+      })
+      .catch((err) => console.error("Erreur chargement trainers:", err));
   }, []);
 
   const handleAddActivity = async () => {

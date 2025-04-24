@@ -6,7 +6,7 @@ import { AuthContext, AuthProvider } from "./contexts/AuthContext";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import Navbar from "./pages/Navbar";
+import Navbar from "./components/Navbar";
 
 function AppContent() {
   const { user } = useContext(AuthContext);
