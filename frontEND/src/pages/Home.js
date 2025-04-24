@@ -23,21 +23,17 @@ function Home() {
         }}
         
       >
-           <h1 style={{ color: '#fff', padding: '100px 0 0 50px' }}>Titre Hero</h1>
+           
         <div className="container text-center ">
           {/* Titre (ex: "Plus de temps pour le sport") */}
           <h1 className="display-3 fw-bold ">{t('home.title')}</h1>
 
-          {/* Description (ex: "Le leader des logiciels de gestion sportive utilisé par des milliers de clubs
-            et d’associations de toutes tailles – des grands clubs multisports aux petites
-            associations locales. Utilisez notre solution pour la gestion des membres et
-            des présences en ligne, la création d’un site Web de club, les collectes de
-            cotisations, la communication et bien plus encore.") */}
+          
           <b
             className="text-white"
             style={{ maxWidth: '900px', margin: '20px auto', display: 'block' }}
           >
-            {t('home.description')}
+          
           </b>
 
           {/* Boutons (ex: "Prendre rendez-vous en ligne" / "Créer un profil") */}

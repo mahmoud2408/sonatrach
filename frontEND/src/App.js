@@ -7,16 +7,19 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Navbar from "./components/Navbar";
+import "./App.css"; // Assure-toi d'importer ton CSS global
 
 function AppContent() {
   const { user } = useContext(AuthContext);
   useEffect(() => {
-    console.log("Utilisateur connecté :", user);
+    console.log("Utilisateur connecté :", user);
   }, [user]);
+
   return (
     <BrowserRouter>
       <Navbar />
-      <div className="mt-4">
+      {/* Wrapper sans marge top */}
+      <div className="content-wrapper">
         <RoutesConfig />
       </div>
       <footer className="bg-light text-muted pt-5 pb-4">
@@ -28,12 +31,9 @@ function AppContent() {
 
 function App() {
   return (
-    console.log("App"),
-    (
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    )
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
