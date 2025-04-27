@@ -1,6 +1,96 @@
+/* Animation classes */
+.animate__animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.animate__fadeIn {
+  animation-name: fadeIn;
+}
+
+.animate__fadeInDown {
+  animation-name: fadeInDown;
+}
+
+.animate__fadeInUp {
+  animation-name: fadeInUp;
+}
+
+.animate__delay-1s {
+  animation-delay: 1s;
+}
+
+.animate__delay-2s {
+  animation-delay: 2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Cards with hover effect */
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Button styles */
+.btn-warning {
+  background-color: #f7a81b; /* Couleur proche de celle de Sonatrach */
+  border-color: #f7a81b;
+}
+
+.btn-warning:hover {
+  background-color: #e09100;
+  border-color: #e09100;
+}
+
+.text-warning {
+  color: #f7a81b !important;
+}
+
+/* Icon wrapper */
+.icon-wrapper {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(247, 168, 27, 0.1);
+  border-radius: 50%;
+}
+
 
 .app-container {
-  margin-bottom: 50px; 
+  margin-bottom: 50px;
   color: #F5F5F5;
 }
 
@@ -17,7 +107,7 @@ h1, h2, h3 {
   transform: scale(1.05) rotate(2deg);
 }
 
-.text-white { 
+.text-white {
 
   color: #F5F5F5;
 }
@@ -29,7 +119,7 @@ h1, h2, h3 {
 
 .log-col {
   color:orange;
-} 
+}
 /* Change la couleur de la navbar (header) */
 .navbar-custom {
   background-color: orange !important; /* Un gris sombre, par exemple */
@@ -53,8 +143,8 @@ h1, h2, h3 {
   border: none !important;
 }
 .btn-rendezvous:hover {
-  background-color:orange !important; 
-}  
+  background-color:orange !important;
+}
 
 .btn-profile {
   background-color: orange !important; /* Vert */
@@ -62,13 +152,13 @@ h1, h2, h3 {
   border: none !important;
 }
 .btn-profile :hover {
-  background-color:orange !important; 
-} 
+  background-color:orange !important;
+}
 
 .nav-col
 {
   color: black;
-} 
+}
 
 .nav-coll
 {
