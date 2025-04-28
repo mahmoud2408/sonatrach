@@ -21,27 +21,49 @@ router.get("/trainers", adminOnly, async (req, res) => {
     });
   }
 });
+/**
+ * GET /api/admin/activity/:id
+ * Récupère une activité par son ID
+ */
+router.get("/activity/:id", adminOnly, async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT activities.*, CONCAT(users.firstName, ' ', users.lastName) AS trainer_name
+       FROM activities
+       LEFT JOIN users ON activities.trainer_id = users.id`
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Activité non trouvée" });
+    }
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'activité :", error);
+    res
+      .status(500)
+      .json({ error: "Erreur interne lors de la récupération de l'activité." });
+  }
+});
 
 /**
  * POST /api/admin/activity
  * Crée une nouvelle activité en lui assignant un entraîneur.
- * Body attendu : { title, date, hour, description, trainerId }
+ * Body attendu : { title, date, hour, description, trainer_id }
  */
 router.post("/activity", adminOnly, async (req, res) => {
   try {
-    const { title, date, hour, description, trainerId } = req.body;
+    const { title, date, hour, description, trainer_id } = req.body;
 
     // Validation minimale
-    if (!title || !date || !hour || !description || !trainerId) {
+    if (!title || !date || !hour || !description || !trainer_id) {
       return res
         .status(400)
-        .json({ error: "Tous les champs sont requis, y compris trainerId." });
+        .json({ error: "Tous les champs sont requis, y compris trainer_id." });
     }
 
     // Vérifier que l'entraîneur existe et a le bon rôle
     const [trainers] = await pool.execute(
       "SELECT id FROM users WHERE id = ? AND role = 'entraineur'",
-      [trainerId]
+      [trainer_id]
     );
     if (trainers.length === 0) {
       return res
@@ -52,9 +74,9 @@ router.post("/activity", adminOnly, async (req, res) => {
     // Insérer l'activité avec son trainer_id
     const [result] = await pool.execute(
       `INSERT INTO activities
-        (title, date, hour, description, trainer_id)
-       VALUES (?, ?, ?, ?, ?)`,
-      [title, date, hour, description, trainerId]
+        (title, date, hour, description, trainer_id,isApproved)
+       VALUES (?, ?, ?, ?, ?,true)`,
+      [title, date, hour, description, trainer_id]
     );
 
     res
@@ -71,24 +93,24 @@ router.post("/activity", adminOnly, async (req, res) => {
 /**
  * PUT /api/admin/activity/:id
  * Modifie une activité, y compris la possibilité de changer l'entraîneur.
- * Body attendu : { title, date, hour, description, trainerId }
+ * Body attendu : { title, date, hour, description, trainer_id }
  */
 router.put("/activity/:id", adminOnly, async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, date, hour, description, trainerId } = req.body;
+    const { title, date, hour, description, trainer_id, isApproved } = req.body;
 
     // Validation minimale
-    if (!title || !date || !hour || !description || !trainerId) {
+    if (!title || !date || !hour || !description || !trainer_id) {
       return res
         .status(400)
-        .json({ error: "Tous les champs sont requis, y compris trainerId." });
+        .json({ error: "Tous les champs sont requis, y compris trainer_id." });
     }
 
     // Vérifier que l'entraîneur existe et a le bon rôle
     const [trainers] = await pool.execute(
       "SELECT id FROM users WHERE id = ? AND role = 'entraineur'",
-      [trainerId]
+      [trainer_id]
     );
     if (trainers.length === 0) {
       return res
@@ -99,9 +121,9 @@ router.put("/activity/:id", adminOnly, async (req, res) => {
     // Mettre à jour l'activité
     await pool.execute(
       `UPDATE activities
-       SET title = ?, date = ?, hour = ?, description = ?, trainer_id = ?
+       SET title = ?, date = ?, hour = ?, description = ?, trainer_id = ?,isApproved = ?
        WHERE id = ?`,
-      [title, date, hour, description, trainerId, id]
+      [title, date, hour, description, trainer_id, isApproved, id]
     );
 
     res.status(200).json({ message: "Activité modifiée" });

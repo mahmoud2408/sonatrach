@@ -70,6 +70,17 @@ export async function getActivities() {
     throw error;
   }
 }
+export async function getAdminActivities() {
+  try {
+    const response = await axios.get("http://localhost:5005/api/admin/activities", {
+      withCredentials: true,
+      headers: { "Cache-Control": "no-cache" },
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export function getMembers() {
   // GET /api/members

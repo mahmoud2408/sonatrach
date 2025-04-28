@@ -11,6 +11,8 @@ function InscriptionActivite() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [req, setReq] = useState({}); // État pour stocker la requête
+  const [session, setSession] = useState({}); // État pour stocker la session
 
   // Charger la liste des activités depuis le backend
   useEffect(() => {
@@ -36,13 +38,13 @@ function InscriptionActivite() {
       const res = await fetch(`${API_URL}/inscriptions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // Inclure les cookies de session
         body: JSON.stringify({
           nom,
           prenom,
-          age,
+          age: Number(age),
           relation: membre,
           activite,
-          currentUserId: localStorage.getItem("userId"),
         }),
       });
       const data = await res.json();

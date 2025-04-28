@@ -12,6 +12,8 @@ router.get("/", async (req, res) => {
         CONCAT(u.firstName, ' ', u.lastName) AS trainerName
       FROM activities a
       LEFT JOIN users u ON a.trainer_id = u.id
+      WHERE a.isApproved = true
+      ORDER BY a.date, a.hour
     `);
 
     // Empêche la mise en cache de la réponse

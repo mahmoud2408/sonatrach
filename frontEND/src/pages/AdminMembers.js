@@ -52,15 +52,15 @@ function AdminMembers() {
   const handleUpdateMember = async (id) => {
     try {
       await axios.put(
-          `${API_URL}/admin/member/${id}`,
-          {
-            nom: editingMember.nom,
-            email: editingMember.email,
-            mobile: editingMember.mobile,
-            categorie: editingMember.categorie,
-            abonnement_expire: editingMember.abonnement_expire,
-          },
-          { withCredentials: true }
+        `${API_URL}/admin/member/${id}`,
+        {
+          nom: editingMember.nom,
+          email: editingMember.email,
+          mobile: editingMember.mobile,
+          categorie: editingMember.categorie,
+          abonnement_expire: editingMember.abonnement_expire,
+        },
+        { withCredentials: true }
       );
 
       // On rafraîchit la liste des membres après la mise à jour
@@ -74,171 +74,176 @@ function AdminMembers() {
   };
 
   return (
-      <div className="container">
-        <h1 className="mt-4">Gestion des Membres</h1>
-        {/* Barre de recherche */}
-        <div className="mb-3">
-          <input
-              type="text"
-              className="form-control"
-              placeholder="Rechercher par nom"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        {filteredMembers.length === 0 ? (
-            <p>Aucun membre trouvé.</p>
-        ) : (
-            <table className="table table-striped">
-              <thead className="table-dark">
-              <tr>
-                <th>ID</th>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Catégorie</th>
-                <th>Date d'inscription</th>
-                <th>Abonnement expire</th>
-                <th>Actions</th>
-              </tr>
-              </thead>
-              <tbody>
-              {filteredMembers.map((member) => (
-                  <tr key={member.id}>
-                    <td>{member.id}</td>
-                    <td>
-                      {editingMember && editingMember.id === member.id ? (
-                          <input
-                              type="text"
-                              value={editingMember.nom}
-                              onChange={(e) =>
-                                  setEditingMember({
-                                    ...editingMember,
-                                    nom: e.target.value,
-                                  })
-                              }
-                              className="form-control"
-                          />
-                      ) : (
-                          member.nom
-                      )}
-                    </td>
-                    <td>
-                      {editingMember && editingMember.id === member.id ? (
-                          <input
-                              type="email"
-                              value={editingMember.email}
-                              onChange={(e) =>
-                                  setEditingMember({
-                                    ...editingMember,
-                                    email: e.target.value,
-                                  })
-                              }
-                              className="form-control"
-                          />
-                      ) : (
-                          member.email
-                      )}
-                    </td>
-                    <td>
-                      {editingMember && editingMember.id === member.id ? (
-                          <input
-                              type="text"
-                              value={editingMember.mobile}
-                              onChange={(e) =>
-                                  setEditingMember({
-                                    ...editingMember,
-                                    mobile: e.target.value,
-                                  })
-                              }
-                              className="form-control"
-                          />
-                      ) : (
-                          member.mobile
-                      )}
-                    </td>
-                    <td>
-                      {editingMember && editingMember.id === member.id ? (
-                          <select
-                              className="form-select"
-                              value={editingMember.categorie}
-                              onChange={(e) =>
-                                  setEditingMember({
-                                    ...editingMember,
-                                    categorie: e.target.value,
-                                  })
-                              }
-                          >
-                            <option value="">-- Sélectionnez --</option>
-                            <option value="Standard">Standard</option>
-                            <option value="Premium">Premium</option>
-                            <option value="VIP">VIP</option>
-                          </select>
-                      ) : (
-                          member.categorie
-                      )}
-                    </td>
-                    <td>
-                      {new Date(member.date_inscription).toLocaleDateString()}
-                    </td>
-                    <td>
-                      {editingMember && editingMember.id === member.id ? (
-                          <input
-                              type="date"
-                              value={editingMember.abonnement_expire ? new Date(editingMember.abonnement_expire).toISOString().substr(0, 10) : ""}
-                              onChange={(e) =>
-                                  setEditingMember({
-                                    ...editingMember,
-                                    abonnement_expire: e.target.value,
-                                  })
-                              }
-                              className="form-control"
-                          />
-                      ) : (
-                          member.abonnement_expire
-                              ? new Date(member.abonnement_expire).toLocaleDateString()
-                              : "-"
-                      )}
-                    </td>
-                    <td>
-                      {editingMember && editingMember.id === member.id ? (
-                          <>
-                            <button
-                                onClick={() => handleUpdateMember(member.id)}
-                                className="btn btn-success btn-se-connecter me-2"
-                            >
-                              Enregistrer
-                            </button>
-                            <button
-                                onClick={() => setEditingMember(null)}
-                                className="btn btn-secondary btn-se-connecter"
-                            >
-                              Annuler
-                            </button>
-                          </>
-                      ) : (
-                          <>
-                            <button
-                                onClick={() => setEditingMember({ ...member })}
-                                className="btn btn-warning me-2"
-                            >
-                              Modifier
-                            </button>
-                            <button
-                                className="btn btn-danger"
-                                onClick={() => handleDeleteMember(member.id)}
-                            >
-                              Supprimer
-                            </button>
-                          </>
-                      )}
-                    </td>
-                  </tr>
-              ))}
-              </tbody>
-            </table>
-        )}
+    <div className="container">
+      <h1 className="mt-4">Gestion des Membres</h1>
+      {/* Barre de recherche */}
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Rechercher par nom"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
+      {filteredMembers.length === 0 ? (
+        <p>Aucun membre trouvé.</p>
+      ) : (
+        <table className="table table-striped">
+          <thead className="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Catégorie</th>
+              <th>Date d'inscription</th>
+              <th>Abonnement expire</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredMembers.map((member) => (
+              <tr key={member.id}>
+                <td>{member.id}</td>
+                <td>
+                  {editingMember && editingMember.id === member.id ? (
+                    <input
+                      type="text"
+                      value={editingMember.nom}
+                      onChange={(e) =>
+                        setEditingMember({
+                          ...editingMember,
+                          nom: e.target.value,
+                        })
+                      }
+                      className="form-control"
+                    />
+                  ) : (
+                    member.nom
+                  )}
+                </td>
+                <td>
+                  {editingMember && editingMember.id === member.id ? (
+                    <input
+                      type="email"
+                      value={editingMember.email}
+                      onChange={(e) =>
+                        setEditingMember({
+                          ...editingMember,
+                          email: e.target.value,
+                        })
+                      }
+                      className="form-control"
+                    />
+                  ) : (
+                    member.email
+                  )}
+                </td>
+                <td>
+                  {editingMember && editingMember.id === member.id ? (
+                    <input
+                      type="text"
+                      value={editingMember.mobile}
+                      onChange={(e) =>
+                        setEditingMember({
+                          ...editingMember,
+                          mobile: e.target.value,
+                        })
+                      }
+                      className="form-control"
+                    />
+                  ) : (
+                    member.telephone
+                  )}
+                </td>
+                <td>
+                  {editingMember && editingMember.id === member.id ? (
+                    <select
+                      className="form-select"
+                      value={editingMember.categorie}
+                      onChange={(e) =>
+                        setEditingMember({
+                          ...editingMember,
+                          categorie: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">-- Sélectionnez --</option>
+                      <option value="Standard">Standard</option>
+                      <option value="Premium">Premium</option>
+                    </select>
+                  ) : (
+                    member.categorie
+                  )}
+                </td>
+                <td>
+                  {new Date(member.date_inscription).toLocaleDateString()}
+                </td>
+                <td>
+                  {editingMember && editingMember.id === member.id ? (
+                    <input
+                      type="date"
+                      value={
+                        editingMember.abonnement_expire
+                          ? new Date(editingMember.abonnement_expire)
+                              .toISOString()
+                              .substr(0, 10)
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setEditingMember({
+                          ...editingMember,
+                          abonnement_expire: e.target.value,
+                        })
+                      }
+                      className="form-control"
+                    />
+                  ) : member.abonnement_expire ? (
+                    new Date(member.abonnement_expire).toLocaleDateString()
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td>
+                  {editingMember && editingMember.id === member.id ? (
+                    <>
+                      <button
+                        onClick={() => handleUpdateMember(member.id)}
+                        className="btn btn-success btn-se-connecter me-2"
+                      >
+                        Enregistrer
+                      </button>
+                      <button
+                        onClick={() => setEditingMember(null)}
+                        className="btn btn-secondary btn-se-connecter"
+                      >
+                        Annuler
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setEditingMember({ ...member })}
+                        className="btn btn-warning me-2"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleDeleteMember(member.id)}
+                      >
+                        Supprimer
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 

@@ -14,16 +14,14 @@ router.post("/activity", trainerOnly, async (req, res) => {
     }
     const [result] = await pool.execute(
       `INSERT INTO activities 
-         (title, date, hour, description, trainer_id) 
-       VALUES (?, ?, ?, ?, ?)`,
+         (title, date, hour, description, trainer_id,isApproved) 
+       VALUES (?, ?, ?, ?, ?,false)`,
       [title, date, hour, description, trainer_id]
     );
-    res
-      .status(201)
-      .json({
-        message: "Activité créée avec succès.",
-        activityId: result.insertId,
-      });
+    res.status(201).json({
+      message: "Activité créée avec succès.",
+      activityId: result.insertId,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur interne du serveur." });
@@ -35,7 +33,7 @@ router.get("/activities", trainerOnly, async (req, res) => {
   try {
     const trainer_id = req.session.userId;
     const [rows] = await pool.execute(
-      "SELECT id, title, date, hour, description FROM activities WHERE trainer_id = ?",
+      "SELECT id, title, date, hour, description,isApproved FROM activities WHERE trainer_id = ?",
       [trainer_id]
     );
     res.status(200).json(rows);
