@@ -39,7 +39,7 @@ function MemberPage() {
       }
     };
     fetchMember();
-  }, [user, navigate]);
+  }, [user, navigate, user?.categorie]);
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p className="text-danger">Erreur : {error}</p>;

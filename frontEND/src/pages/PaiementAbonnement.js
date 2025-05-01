@@ -25,7 +25,9 @@ function PaiementAbonnement() {
         { user_id: user.userId, categorie },
         { withCredentials: true }
       );
-      login({ user, role: user.role, isMembre: true }); // Mettez à jour le contexte d'authentification
+      login({ user, role: user.role, isMembre: true });
+      navigate("/member", { replace: true });
+      window.location.reload(); // Mettez à jour le contexte d'authentification
       console.log("Réponse de paiement :", response.data);
       alert(response.data.message);
     } catch (error) {

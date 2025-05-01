@@ -1,0 +1,68 @@
+/* Style de la superposition */
+.logout-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Style de la boîte de confirmation */
+.logout-confirm-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.logout-confirm-box h5 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.logout-confirm-box p {
+  color: #7f8c8d;
+  margin-bottom: 1.5rem;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-confirm {
+  background-color: #e74c3c;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.btn-confirm:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  background-color: #bdc3c7;
+  color: #2c3e50;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #95a5a6;
+  transform: translateY(-2px);
+}
