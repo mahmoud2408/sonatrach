@@ -23,48 +23,51 @@ router.post("/payer-abonnement", async (req, res) => {
       [user_id]
     );
 
-    // Gestion des conflits
+    // Gestion des cas selon le statut existant
     if (existing.length > 0) {
-      if (
-        existing[0].categorie.toLowerCase() === "premium" &&
-        categorie === "Premium"
-      ) {
+      const currentCategory = existing[0].categorie.toLowerCase();
+      const requestedCategory = categorie.toLowerCase();
+
+      // Cas 1: Déjà Premium
+      if (currentCategory === "premium") {
         return res.status(409).json({
-          error: "L'utilisateur possède déjà un abonnement Premium.",
+          error: "Vous possédez déjà un abonnement Premium.",
         });
       }
-      if (categorie !== "Standard") {
+
+      // Cas 2: Standard tentant autre chose qu'une amélioration
+      if (currentCategory === "standard" && requestedCategory !== "ameliorer") {
         return res.status(409).json({
-          error: "L'utilisateur est déjà membre.",
+          error: "Vous ne pouvez que améliorer votre abonnement Standard.",
+        });
+      }
+    } else {
+      // Cas 3: Nouvel utilisateur tentant une amélioration
+      if (categorie.toLowerCase() === "ameliorer") {
+        return res.status(400).json({
+          error: "Vous devez d'abord souscrire à un abonnement Standard.",
         });
       }
     }
 
-    // Récupération des informations utilisateur
-    const db = req.session.sonatrach ? sonatrachPool : pool;
-    const [userRows] = await db.execute(
-      "SELECT firstName, lastName, email FROM users WHERE id = ?",
-      [user_id]
-    );
+    // ... (le reste du code reste inchangé jusqu'à la mise à jour/insertion)
 
-    if (userRows.length === 0) {
-      return res.status(404).json({ error: "Utilisateur introuvable." });
-    }
-
-    const { firstName, lastName, email } = userRows[0];
-    const nomComplet = `${firstName} ${lastName}`;
-
-    // Mise à jour ou création du membre
-    if (categorie === "Premium") {
-      await connection.execute(
+    // Vérification de la réussite de l'opération
+    let result;
+    if (categorie === "ameliorer") {
+      [result] = await connection.execute(
         `UPDATE membres SET 
           categorie = ?, 
           abonnement_expire = DATE_ADD(NOW(), INTERVAL 1 YEAR) 
         WHERE user_id = ?`,
-        [categorie, user_id]
+        ["premium", user_id]
       );
+
+      if (result.affectedRows === 0) {
+        throw new Error("Échec de la mise à jour de l'abonnement");
+      }
     } else {
-      await connection.execute(
+      [result] = await connection.execute(
         `INSERT INTO membres 
           (user_id, nom, email, categorie, date_inscription, abonnement_expire) 
         VALUES (?, ?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR))`,

@@ -6,45 +6,38 @@ import { AuthContext } from "../contexts/AuthContext";
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5005/api";
 
 export default function LoginSonatrach() {
-  const { user } = useContext(AuthContext);
+  const { user, login } = useContext(AuthContext);
   const [loginField, setLoginField] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const queryParams = new URLSearchParams(location.search);
-  const redirectPath = queryParams.get("redirect") || "/";
+  const redirectPath =
+    new URLSearchParams(location.search).get("redirect") || "/";
 
+  // If already logged in, redirect
   useEffect(() => {
-    // Si l'utilisateur est déjà défini dans le contexte, redirigez directement
     if (user && user.userId) {
-      navigate(redirectPath);
+      navigate(redirectPath, { replace: true });
     } else {
-      // Sinon, appelez l'endpoint /auth/me pour vérifier la session (optionnel si AuthContext se charge déjà de cela)
-      fetch(`${API_URL}/auth/me`, {
-        method: "GET",
-        credentials: "include",
-      })
+      // Verify existing session
+      fetch(`${API_URL}/auth/me`, { method: "GET", credentials: "include" })
         .then((res) => res.json())
         .then((data) => {
           if (data.userId) {
-            // Mettre à jour le contexte si nécessaire, puis rediriger
             login({
               userId: data.userId,
               role: data.role,
               isMembre: data.isMembre,
               sonatrach: data.sonatrach,
             });
-            navigate(redirectPath);
+            navigate(redirectPath, { replace: true });
           }
         })
-        .catch((error) => {
-          console.error("Erreur de vérification de session :", error);
-        });
+        .catch(console.error);
     }
-  }, [navigate, redirectPath, user, login]);
+  }, [user, login, navigate, redirectPath]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,25 +47,21 @@ export default function LoginSonatrach() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          login: loginField, // email ou username dans la DB Sonatrach
-          password,
-        }),
+        body: JSON.stringify({ login: loginField, password }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Échec de la connexion Sonatrach");
         return;
       }
-      // on récupère userId, role, isMembre
+      // Save to context
       login({
         userId: data.userId,
         role: data.role,
         isMembre: data.isMembre,
         sonatrach: data.sonatrach,
       });
-      // redirige vers la home ou une route protégée
-      navigate(redirectPath);
+      navigate(redirectPath, { replace: true });
     } catch (err) {
       console.error("Erreur Sonatrach-login :", err);
       setError("Erreur réseau lors de la connexion");
@@ -88,8 +77,8 @@ export default function LoginSonatrach() {
             Email ou Identifiant Sonatrach
           </label>
           <input
-            type="text"
             id="loginField"
+            type="text"
             className="form-control"
             placeholder="Entrez votre email ou identifiant"
             value={loginField}
@@ -102,8 +91,8 @@ export default function LoginSonatrach() {
             Mot de passe
           </label>
           <input
-            type="password"
             id="password"
+            type="password"
             className="form-control"
             placeholder="Entrez votre mot de passe"
             value={password}

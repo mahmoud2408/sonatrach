@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
-const sonatrachPool = require("../config/sonatrachDb"); // DB Sonatrach
+const ldap = require("ldapjs");
+const { authenticateLDAP } = require("../config/sonatrachDb");
+const session = require("express-session");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 
@@ -238,53 +240,104 @@ router.get("/me", async (req, res) => {
 router.post("/sonatrach-login", async (req, res) => {
   try {
     const { login, password } = req.body;
-    // On interroge la table `user` de la DB sonatrach
-    const [users] = await sonatrachPool.execute(
-      "SELECT * FROM users WHERE email = ? OR username = ?",
-      [login, login]
-    );
-    if (users.length === 0) {
+    if (!login || !password) {
+      return res.status(400).json({ error: "Identifiants manquants" });
+    }
+
+    // 1) Authentification LDAP
+    const userInfo = await authenticateLDAP(login, password);
+    // userInfo contient désormais directement : { uid, cn, sn, mail, telephoneNumber }
+
+    // 2) Valider les attributs critiques
+    const { uid, cn, sn, mail, telephoneNumber } = userInfo;
+    if (!uid || !sn || !mail) {
       return res
         .status(400)
-        .json({ error: "Utilisateur Sonatrach non trouvé." });
-    }
-    const user = users[0];
-    // Si la colonne passwordHash existe là-bas
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
-    if (!isMatch) {
-      return res.status(400).json({ error: "Mot de passe incorrect." });
+        .json({ error: "Profil LDAP incomplet (uid, nom ou email manquant)" });
     }
 
-    // À partir d’ici, on se comporte comme un utilisateur « normal » :
-    // On peut vérifier s’il est membre dans la DB principale
+    // 3) Préparer les données pour la base
+    const username = uid;
+    const lastName = sn;
+    const email = mail;
+    const firstName = cn || "NonRenseigné"; // on utilise cn comme prénom/nom complet
+    const mobile = telephoneNumber || null;
+
+    console.log("Données LDAP extraites :", {
+      username,
+      lastName,
+      email,
+      firstName,
+      mobile,
+    });
+
+    // 4) Vérifier/créer l’utilisateur en base
+    const [users] = await pool.execute(
+      "SELECT * FROM users WHERE username = ? OR email = ?",
+      [username, email]
+    );
+
+    let userId, role;
+    if (users.length === 0) {
+      const [result] = await pool.execute(
+        `INSERT INTO users 
+           (firstName, lastName, email, username, role, passwordHash, isOver16, acceptTerms, acceptNotifications, mobile) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          firstName,
+          lastName,
+          email,
+          username,
+          "user",
+          "LDAP_AUTH", // placeholder
+          1, // isOver16
+          1, // acceptTerms
+          0, // acceptNotifications
+          mobile,
+        ]
+      );
+      userId = result.insertId;
+      role = "user";
+    } else {
+      userId = users[0].id;
+      role = users[0].role;
+    }
+
+    // 5) Vérifier si l’utilisateur est membre
     const [members] = await pool.execute(
       "SELECT id FROM membres WHERE email = ?",
-      [user.email]
+      [email]
     );
-    let isMembre = members.length > 0;
-    const sonatrach = true; // On indique que c'est un utilisateur Sonatrach
+    const isMembre = members.length > 0;
 
-    // On stocke en session
-    req.session.userId = user.id;
+    // 6) Mettre à jour la session
+    req.session.userId = userId;
+    req.session.role = role;
     req.session.isMembre = isMembre;
-    req.session.role = user.role || "user";
-    req.session.sonatrach = true; // flag pour indiquer le mode Sonatrach
+    req.session.sonatrach = true;
 
-    res.json({
-      message: "Connexion Sonatrach réussie.",
-      userId: user.id,
-      role: req.session.role,
+    // 7) Répondre au frontend
+    res.status(200).json({
+      message: "Connexion réussie",
+      userId,
+      role,
       isMembre,
-      sonatrach,
+      sonatrach: true,
     });
   } catch (err) {
-    console.error("Erreur Sonatrach-login:", err);
-    res.status(500).json({ error: "Erreur interne Sonatrach-login." });
+    console.error("Erreur lors de la connexion Sonatrach :", err.message);
+    if (err.message.includes("Échec de l'authentification LDAP")) {
+      return res.status(401).json({ error: "Identifiants LDAP invalides" });
+    }
+    if (err.message.includes("Utilisateur LDAP non trouvé")) {
+      return res.status(404).json({ error: "Profil LDAP introuvable" });
+    }
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
+
+module.exports = router;
 
 // Dans routes/auth.js
 
 // Endpoint pour vérifier la session de l'utilisateur
-
-module.exports = router;
