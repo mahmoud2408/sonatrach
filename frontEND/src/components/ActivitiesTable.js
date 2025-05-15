@@ -1,15 +1,12 @@
 // frontend/src/components/ActivitiesTable.js
-import React, { useEffect, useState } from "react";
-import { getActivities } from "../services/api";
-import "animate.css"; // Import de la bibliothèque d'animations
+import React, { useEffect, useState, useContext } from "react";
+import { getActivities, getUserActivities } from "../services/api";
+import { AuthContext } from "../contexts/AuthContext";
+import "animate.css"; // pour animations
 
-const ActivityRow = ({ activity }) => {
+const ActivityRow = ({ activity, showUser }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const toggleDescription = () => {
-    setIsExpanded(!isExpanded);
-  };
-
+  const toggleDescription = () => setIsExpanded(!isExpanded);
   const trainer =
     activity.trainerName ??
     (activity.trainerFirstName && activity.trainerLastName
@@ -33,12 +30,20 @@ const ActivityRow = ({ activity }) => {
         <td>{trainer}</td>
         <td>{new Date(activity.date).toLocaleDateString("fr-FR")}</td>
         <td>{activity.hour}</td>
-        <td>{activity.membersCount ?? 0}</td>
+        {showUser ? (
+          <>
+            <td>{activity.nom}</td>
+            <td>{activity.prenom}</td>
+            <td>{activity.age}</td>
+            <td>{activity.relation}</td>
+          </>
+        ) : (
+          <td>{activity.membersCount ?? 0}</td>
+        )}
       </tr>
-
       {isExpanded && (
         <tr className="animate__animated animate__fadeInDown">
-          <td colSpan="5">
+          <td colSpan={showUser ? "8" : "5"}>
             <div className="p-3 bg-light">
               <strong>Description :</strong>
               <p className="mb-0 mt-2 animate__animated animate__fadeIn">
@@ -52,21 +57,46 @@ const ActivityRow = ({ activity }) => {
   );
 };
 
-function ActivitiesTable() {
+export default function ActivitiesTable({ showUserActivities = false }) {
+  const { user } = useContext(AuthContext);
   const [activities, setActivities] = useState([]);
+  const [showUser, setShowUser] = useState(showUserActivities);
 
   useEffect(() => {
-    getActivities()
-      .then((res) => setActivities(res.data))
-      .catch((err) => console.error("Erreur de chargement:", err));
-  }, []);
+    const fetchData = async () => {
+      try {
+        if (showUser) {
+          const res = await getUserActivities(user.userId);
+          setActivities(res.data);
+        } else {
+          const res = await getActivities();
+          setActivities(res.data);
+        }
+      } catch (err) {
+        console.error("Erreur de chargement:", err);
+      }
+    };
+    fetchData();
+  }, [showUser, user]);
+
+  const toggleView = () => setShowUser(!showUser);
 
   return (
     <div className="container mt-3 animate__animated animate__fadeInUp">
-      <h3>Activités Disponibles</h3>
+      <div className="d-flex justify-content-between align-items-center">
+        <h3>{showUser ? "Mes Activités" : "Activités Disponibles"}</h3>
+        {user && (
+          <button onClick={toggleView} className="btn btn-outline-secondary">
+            {showUser ? "Voir Toutes" : "Mes Activités"}
+          </button>
+        )}
+      </div>
+
       {activities.length === 0 ? (
         <p className="animate__animated animate__shakeX">
-          Aucune activité pour le moment.
+          {showUser
+            ? "Vous n'êtes inscrit à aucune activité."
+            : "Aucune activité pour le moment."}
         </p>
       ) : (
         <table className="table table-bordered table-striped">
@@ -76,12 +106,25 @@ function ActivitiesTable() {
               <th>Entraîneur</th>
               <th>Date</th>
               <th>Heure</th>
-              <th>Participants</th>
+              {showUser ? (
+                <>
+                  <th>Nom</th>
+                  <th>Prénom</th>
+                  <th>Âge</th>
+                  <th>Relation</th>
+                </>
+              ) : (
+                <th>Participants</th>
+              )}
             </tr>
           </thead>
           <tbody>
             {activities.map((activity) => (
-              <ActivityRow key={activity.id} activity={activity} />
+              <ActivityRow
+                key={showUser ? activity.id : activity.id}
+                activity={activity}
+                showUser={showUser}
+              />
             ))}
           </tbody>
         </table>
@@ -89,5 +132,3 @@ function ActivitiesTable() {
     </div>
   );
 }
-
-export default ActivitiesTable;

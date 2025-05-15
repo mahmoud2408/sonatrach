@@ -72,10 +72,13 @@ export async function getActivities() {
 }
 export async function getAdminActivities() {
   try {
-    const response = await axios.get("http://localhost:5005/api/admin/activities", {
-      withCredentials: true,
-      headers: { "Cache-Control": "no-cache" },
-    });
+    const response = await axios.get(
+      "http://localhost:5005/api/admin/activities",
+      {
+        withCredentials: true,
+        headers: { "Cache-Control": "no-cache" },
+      }
+    );
     return response;
   } catch (error) {
     throw error;
@@ -85,4 +88,10 @@ export async function getAdminActivities() {
 export function getMembers() {
   // GET /api/members
   return axios.get(`${API_URL}/members`, { withCredentials: true });
+}
+
+export function getUserActivities(userId) {
+  return axios.get(`${API_URL}/inscriptions/user/${userId}`, {
+    withCredentials: true,
+  });
 }

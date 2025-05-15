@@ -70,4 +70,59 @@ router.post("/", async (req, res) => {
   }
 });
 
+// GET /api/inscriptions/user/:userId
+// Renvoie les activités auxquelles l'utilisateur est inscrit
+router.get("/user/:userId", async (req, res) => {
+  const userId = parseInt(req.params.userId, 10);
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: "userId invalide" });
+  }
+
+  try {
+    // On joint inscriptions et activities
+    const [rows] = await pool.execute(
+      `
+      SELECT
+        i.id AS inscriptionId,
+        a.id AS activityId,
+        a.title,
+        a.date,
+        a.hour,
+        a.description,
+        i.nom,
+        i.prenom,
+        i.age,
+        i.relation
+      FROM inscriptions i
+      JOIN activities a
+        ON i.activity_id = a.id
+      WHERE i.user_id = ?
+      ORDER BY a.date, a.hour
+      `,
+      [userId]
+    );
+
+    // si besoin, formate les dates en ISO ou en locale
+    const formatted = rows.map((r) => ({
+      inscriptionId: r.inscriptionId,
+      activityId: r.activityId,
+      title: r.title,
+      date: r.date, // ou new Date(r.date).toISOString()
+      hour: r.hour,
+      description: r.description,
+      nom: r.nom,
+      prenom: r.prenom,
+      age: r.age,
+      relation: r.relation,
+    }));
+
+    res.status(200).json(formatted);
+  } catch (err) {
+    console.error("Erreur récupération user activities :", err);
+    res.status(500).json({
+      error: "Erreur interne lors de la récupération des inscriptions",
+    });
+  }
+});
+
 module.exports = router;
