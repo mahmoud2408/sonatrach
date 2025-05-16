@@ -11,8 +11,6 @@ function InscriptionActivite() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [req, setReq] = useState({}); // État pour stocker la requête
-  const [session, setSession] = useState({}); // État pour stocker la session
 
   // Charger la liste des activités depuis le backend
   useEffect(() => {

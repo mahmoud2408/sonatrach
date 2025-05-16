@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
 
 function ContactPage() {
-  const [objet, setObjet] = useState('');
-  const [nom, setNom] = useState('');
-  const [prenom, setPrenom] = useState('');
-  const [societe, setSociete] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
+  const [objet, setObjet] = useState("");
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [societe, setSociete] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const [copy, setCopy] = useState(false); // Pour la case "Recevoir une copie..."
 
   const handleSubmit = async (e) => {
@@ -15,27 +14,35 @@ function ContactPage() {
     // Ici, tu peux envoyer les données au backend via une API
     // Ex: axios.post('/api/contact', { objet, nom, prenom, societe, email, message, copy })
     console.log({ objet, nom, prenom, societe, email, message, copy });
-    alert('Formulaire envoyé !');
+    alert("Formulaire envoyé !");
   };
 
   return (
-    <div className="container my-5" style={{ maxWidth: '800px' }}>
+    <div className="container my-5" style={{ maxWidth: "800px" }}>
       <h2 className="mb-4">Nous contacter</h2>
       <form onSubmit={handleSubmit}>
         {/* Choisir l'objet de la demande */}
         <div className="mb-3">
-        <label className="form-label">(les case qui contient ' * ' sont obligatoire)</label> 
-        <br></br>
-          <label className="form-label">Choisissez l'objet de votre demande</label>
+          <label className="form-label">
+            (les case qui contient ' * ' sont obligatoire)
+          </label>
+          <br></br>
+          <label className="form-label">
+            Choisissez l'objet de votre demande
+          </label>
           <select
             className="form-select"
             value={objet}
             onChange={(e) => setObjet(e.target.value)}
           >
             <option value=""> Sélectionnez </option>
-            <option value="Demande d'informations">Demande d'informations</option>
+            <option value="Demande d'informations">
+              Demande d'informations
+            </option>
             <option value="Problème technique">Problème technique</option>
-            <option value="Inscription à une activité">Inscription à une activité</option>
+            <option value="Inscription à une activité">
+              Inscription à une activité
+            </option>
             <option value="Autre">Autre</option>
           </select>
         </div>
