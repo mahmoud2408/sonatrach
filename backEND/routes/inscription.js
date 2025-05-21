@@ -54,11 +54,7 @@ router.post("/", async (req, res) => {
  VALUES (?, ?, ?, ?, ?, ?)`,
       [currentUserId, nom, prenom, age, relation, activite]
     );
-    // Incrémenter membersCount dans activities
-    await connection.execute(
-      "UPDATE activities SET membersCount = membersCount + 1 WHERE id = ?",
-      [activite]
-    );
+
     res
       .status(201)
       .json({ message: "Inscription à l'activité enregistrée avec succès." });
@@ -75,11 +71,10 @@ router.post("/", async (req, res) => {
 router.get("/user/:userId", async (req, res) => {
   const userId = parseInt(req.params.userId, 10);
   if (isNaN(userId)) {
-    return res.status(400).json({ error: "userId invalide" });
+    return res.status(400).json({ error: "ID utilisateur invalide" });
   }
 
   try {
-    // On joint inscriptions et activities
     const [rows] = await pool.execute(
       `
       SELECT
@@ -89,38 +84,33 @@ router.get("/user/:userId", async (req, res) => {
         a.date,
         a.hour,
         a.description,
+        CONCAT(u.firstName, ' ', u.lastName) AS trainer, 
         i.nom,
         i.prenom,
         i.age,
         i.relation
       FROM inscriptions i
-      JOIN activities a
-        ON i.activity_id = a.id
+      JOIN activities a ON i.activity_id = a.id
+      JOIN users u ON a.trainer_id = u.id 
       WHERE i.user_id = ?
       ORDER BY a.date, a.hour
       `,
       [userId]
     );
 
-    // si besoin, formate les dates en ISO ou en locale
     const formatted = rows.map((r) => ({
-      inscriptionId: r.inscriptionId,
-      activityId: r.activityId,
-      title: r.title,
-      date: r.date, // ou new Date(r.date).toISOString()
-      hour: r.hour,
-      description: r.description,
-      nom: r.nom,
-      prenom: r.prenom,
-      age: r.age,
-      relation: r.relation,
+      ...r,
+      date: new Date(r.date).toISOString().split("T")[0],
+      hour: r.hour.slice(0, 5),
+      trainer: r.trainer, // On récupère le nom concaténé
     }));
 
     res.status(200).json(formatted);
   } catch (err) {
-    console.error("Erreur récupération user activities :", err);
+    console.error("Erreur SQL :", err);
     res.status(500).json({
-      error: "Erreur interne lors de la récupération des inscriptions",
+      error: "Erreur lors de la récupération des inscriptions",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
