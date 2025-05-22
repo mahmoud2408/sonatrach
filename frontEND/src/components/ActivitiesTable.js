@@ -27,7 +27,8 @@ const ActivityRow = ({ activity, showUser }) => {
             </button>
           </div>
         </td>
-        <td>{activity.trainer}</td>
+        {showUser ? <td>{activity.trainer}</td> : <td>{trainer}</td>}
+
         <td>{new Date(activity.date).toLocaleDateString("fr-FR")}</td>
         <td>{activity.hour}</td>
         {showUser ? (
